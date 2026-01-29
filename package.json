@@ -32,5 +32,8 @@
     "react-native-svg": "15.12.1",
     "react-native-web": "^0.21.0"
   },
+  "overrides": {
+    "babel-plugin-react-compiler": "0.0.0-experimental-ca8e0be-20240916"
+  },
   "private": true
 }
