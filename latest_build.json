@@ -1,0 +1,53 @@
+﻿[
+  {
+    "id": "761cb118-85f9-4049-b7dc-e9fcf973cc0d",
+    "status": "ERRORED",
+    "platform": "ANDROID",
+    "error": {
+      "errorCode": "UNKNOWN_ERROR",
+      "message": "Unknown error. See logs of the Prepare project build phase for more information."
+    },
+    "artifacts": {},
+    "fingerprint": {
+      "id": "019c0a41-e086-7a7b-9c6f-435089233cb2",
+      "hash": "831e95f41cf6be7e0de7de23e168bccdcd31d2ec"
+    },
+    "initiatingActor": {
+      "id": "521bacea-0bbe-4d3e-acfe-ac57392b6e63",
+      "displayName": "gabriel_ndo"
+    },
+    "logFiles": [
+      "https://job-logs.eascdn.net/production/761cb118-85f9-4049-b7dc-e9fcf973cc0d/1769700427670-48e9e613-672f-46e5-beec-3ef336c3426b.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260129%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260129T164003Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=72dbb911acc1b89006cac70ca14d97704302d48e2a40fdfe78366887535d6857ea7eae234333d42be7c5b742ec7b3458663bb2b2720117d17822e4a77562fc2c0a3f2055b4ee3fbf3bbf686cd49a2e294e70fae81086c795a3bda907a7bafb87d049429eeb4c8f4ba4ea83adb31de21d64ae9916e2e545ed935a7d38ffa9c2ca6aa679e5ecccdc5891c107dc888c787fb6ff5ddf0ff15f90989c299adb2e1e11b12d941a7fa130555fe0c8a7626f6a97e60004d03f8b9ce5b54426e4efdf4cda477722ac113fafdda8572fe25cfb018918b23b4f1800b626e66b8dec9a8914f71737fd88478552b8401ccd4f00cac32c0295ddc3e1596657ef6390873ba14378",
+      "https://job-logs.eascdn.net/production/761cb118-85f9-4049-b7dc-e9fcf973cc0d/1769701977212-07e5de66-a56b-4e43-bc18-d06f182e0d44.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260129%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260129T164003Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=456c2db5ebc4f168bb53415e5a2be49061470d8e635d9afefe8fc57927351f3a805ffffc56e938471ff197d2a1912fdad0fc7c66f119a6f8f3f6935fbd44f55aed814765256cf07aded67095103fe91cbc7bd87eaae9709678efcabc7c1ad7b0561e28d11eb794d83713939e90e83be9cf4d716ff5a01416941f477b7a1810eda3091f05ff2b64385944463fe1bc2f216b4e08e72e994006f135839f0b17c4ebf008de947b4d81779389c354018c3a309bc3a2619f81ab89c1a0fdfaf898b0578f9469d96dedcd39c3bbf0cbc15c1bbb7ede0a49197cf62ef208cd14af3606660200ed4a6e7e2b51e32193d43d464fbdcd5dcdc4fa1a8b24addf09bdd9f68fe6",
+      "https://job-logs.eascdn.net/production/761cb118-85f9-4049-b7dc-e9fcf973cc0d/1769701977440-0b4ee755-8574-4cfe-be69-2c037c4c4669.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260129%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260129T164003Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=2dd0ab98d05124e6763125abe859e1d13104968ce7fec7ec900f9d10a6a550e01b05685621ca8ad119f210a0d71f9fc03ac0d0ab5e718dd7fd04824d5579cb38a61fb77acd5f7c02686ccc98756e25359767eec933acbeabb093313c5f5cb917485d539178e02af6e039f3718b9ba31e3daba72ba966b565f368591920851426ca393a49ad48f60f860f6d0f557acc8477a12b59a8719d9292e8cc767dc911c531219e53196037d2506bfbf440fdbccb72b210911e64b231cc27c697cde4920acc7e371b8b957653b5157e168a24eda9ecb395706e2972cfe502e2d886f7eb43d8cfca6e60a82a9fb32b89c80384284eaaf6fd87fb46be6025727b25de441341",
+      "https://job-logs.eascdn.net/production/761cb118-85f9-4049-b7dc-e9fcf973cc0d/1769701977631-36a1d4b4-a863-40de-a3ac-ee31d4aac0b4.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260129%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260129T164003Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=5195b69ae153b361c7ef523f6f3851320a3d60d1b59a35006c9e2f390d96ace54b696293f97e246e217681efdb928fab276ba2b7991aeef413107e52798f06d4b02b99b4bedfefdc0f706d3b3ceedc96d18557e2115b55b01a4f0b39f82939e7b5904d831598c2ea185b7cab163f8536a2795c6c6b215eeb223f32f004bf0d1c43e9fcf75e9610c702192cdb3fabfb84cd5da275b781b3906d8f398f1a3edd6a09bdd5b2a1cc13187aa5fefa1f9f42ef5ca0741c2927db789703026cdab7c32b0e3f8dc45bccfb5d382d2f4273bbc6fe4cf6bdf9df5510e7412316a3f6223b5aa3135d674e07df69074f4864d59f92ab83058fc02ac73011ac4b2392b92b871f"
+    ],
+    "project": {
+      "id": "5cd42645-f4b5-4983-adc5-336d38a21f04",
+      "name": "supplement-tracker",
+      "slug": "supplement-tracker",
+      "ownerAccount": {
+        "id": "3f66f7df-5b89-4068-bf8b-4b4b13ccde0e",
+        "name": "gabriel_ndo"
+      }
+    },
+    "distribution": "STORE",
+    "buildProfile": "preview",
+    "sdkVersion": "54.0.0",
+    "appVersion": "1.0.0",
+    "appBuildVersion": "1",
+    "gitCommitHash": "7e4c4106d85a79b5fb3841b5eb86c8ed2cf479f2",
+    "gitCommitMessage": "Clean build commit",
+    "priority": "NORMAL",
+    "createdAt": "2026-01-29T15:27:07.424Z",
+    "updatedAt": "2026-01-29T15:53:59.782Z",
+    "completedAt": "2026-01-29T15:53:54.069Z",
+    "expirationDate": "2026-02-28T15:27:07.473Z",
+    "isForIosSimulator": false,
+    "metrics": {
+      "buildWaitTime": 162,
+      "buildQueueTime": 1595038,
+      "buildDuration": 11159
+    }
+  }
+]

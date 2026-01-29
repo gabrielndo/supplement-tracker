@@ -1,0 +1,17 @@
+﻿Running 17 checks on your project...
+16/17 checks passed. 1 checks failed. Possible issues detected:
+Use the --verbose flag to see more details about passed checks.
+
+Ô£û Check that packages match versions required by installed Expo SDK
+
+ÔÜá´©Å Minor version mismatches
+package                                 expected  found  
+@react-native-community/datetimepicker  8.4.4     8.6.0  
+
+
+
+1 package out of date.
+Advice:
+Use 'npx expo install --check' to review and upgrade your dependencies.
+To ignore specific packages, add them to "expo.install.exclude" in package.json. Learn more: https://expo.fyi/dependency-validation
+
