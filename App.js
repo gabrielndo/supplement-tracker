@@ -1,13 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
+import { View, ActivityIndicator } from 'react-native';
 import { lightImpact } from './src/services/haptics';
 import * as Notifications from 'expo-notifications';
 import { configureNotifications, requestPermissions, handleNotificationAction, WATER_CATEGORY } from './src/services/notifications';
+import { getAuthUser, isAuthenticated } from './src/services/authStorage';
+import { getProfile } from './src/services/storage';
 
 import HomeScreen from './src/screens/HomeScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
@@ -16,7 +19,9 @@ import WaterScreen from './src/screens/WaterScreen';
 import WaterHistoryScreen from './src/screens/WaterHistoryScreen';
 import StatsScreen from './src/screens/StatsScreen';
 import AchievementsScreen from './src/screens/AchievementsScreen';
-import { PillIcon } from './src/components/PillIcon';
+import WelcomeScreen from './src/screens/WelcomeScreen';
+import OnboardingScreen from './src/screens/OnboardingScreen';
+import { colors } from './src/styles/theme';
 
 const Tab = createBottomTabNavigator();
 const WaterStack = createNativeStackNavigator();
@@ -74,12 +79,11 @@ function AppContent() {
       handleNotificationAction(response);
 
       // Handle Navigation
-      // If default action (tap on body) OR specific action if we wanted
       if (actionIdentifier === Notifications.DEFAULT_ACTION_IDENTIFIER) {
         if (category === WATER_CATEGORY || data?.type === 'water') {
           navigation.navigate('Água', { screen: 'WaterMain' });
         } else if (data?.type === 'supplement') {
-          navigation.navigate('Suplementos'); // Or just go to supplements
+          navigation.navigate('Suplementos');
         }
       }
     });
@@ -181,6 +185,78 @@ function AppContent() {
 }
 
 export default function App() {
+  const [authState, setAuthState] = useState({
+    loading: true,
+    isAuth: false,
+    hasProfile: false,
+    userName: '',
+  });
+
+  useEffect(() => {
+    checkAuthStatus();
+  }, []);
+
+  const checkAuthStatus = async () => {
+    try {
+      const isAuth = await isAuthenticated();
+      if (isAuth) {
+        const user = await getAuthUser();
+        const profile = await getProfile();
+        setAuthState({
+          loading: false,
+          isAuth: true,
+          hasProfile: !!profile,
+          userName: user?.name || 'Usuário',
+        });
+      } else {
+        setAuthState({
+          loading: false,
+          isAuth: false,
+          hasProfile: false,
+          userName: '',
+        });
+      }
+    } catch (error) {
+      console.error('Error checking auth status:', error);
+      setAuthState({
+        loading: false,
+        isAuth: false,
+        hasProfile: false,
+        userName: '',
+      });
+    }
+  };
+
+  const handleWelcomeComplete = () => {
+    checkAuthStatus();
+  };
+
+  const handleOnboardingComplete = () => {
+    setAuthState(prev => ({
+      ...prev,
+      hasProfile: true,
+    }));
+  };
+
+  if (authState.loading) {
+    return (
+      <View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    );
+  }
+
+  // Not authenticated -> Show Welcome/Login screen
+  if (!authState.isAuth) {
+    return <WelcomeScreen onComplete={handleWelcomeComplete} />;
+  }
+
+  // Authenticated but no profile -> Show Onboarding
+  if (!authState.hasProfile) {
+    return <OnboardingScreen userName={authState.userName} onComplete={handleOnboardingComplete} />;
+  }
+
+  // Authenticated and has profile -> Show main app
   return (
     <NavigationContainer>
       <AppContent />
