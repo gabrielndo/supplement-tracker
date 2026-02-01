@@ -10,6 +10,7 @@ import {
     Platform,
     ScrollView,
     ActivityIndicator,
+    Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Google from 'expo-auth-session/providers/google';
@@ -190,7 +191,11 @@ export default function WelcomeScreen({ onComplete }) {
         <View style={styles.container}>
             <View style={styles.content}>
                 <View style={styles.logoContainer}>
-                    <Text style={styles.logo}>💊</Text>
+                    <Image
+                        source={require('../../assets/logo.png')}
+                        style={styles.logoImage}
+                        resizeMode="contain"
+                    />
                     <Text style={styles.appName}>Supplement Tracker</Text>
                     <Text style={styles.tagline}>
                         Monitore seus suplementos e água com inteligência
@@ -269,9 +274,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginBottom: spacing.xxxl,
     },
-    logo: {
-        fontSize: 80,
-        marginBottom: spacing.md,
+    logoImage: {
+        width: 120,
+        height: 120,
+        marginBottom: spacing.lg,
     },
     appName: {
         ...typography.h1,
