@@ -16,7 +16,6 @@ import WaterScreen from './src/screens/WaterScreen';
 import WaterHistoryScreen from './src/screens/WaterHistoryScreen';
 import StatsScreen from './src/screens/StatsScreen';
 import AchievementsScreen from './src/screens/AchievementsScreen';
-import ExportScreen from './src/screens/ExportScreen';
 import { PillIcon } from './src/components/PillIcon';
 
 const Tab = createBottomTabNavigator();
@@ -49,7 +48,6 @@ function ProfileStackNavigator() {
   return (
     <ProfileStack.Navigator screenOptions={{ headerShown: false }}>
       <ProfileStack.Screen name="ProfileMain" component={ProfileScreen} />
-      <ProfileStack.Screen name="Export" component={ExportScreen} />
     </ProfileStack.Navigator>
   );
 }

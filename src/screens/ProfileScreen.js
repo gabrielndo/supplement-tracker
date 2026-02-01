@@ -506,19 +506,6 @@ export default function ProfileScreen({ navigation }) {
                     ⚠️ As sugestões não substituem orientação profissional
                 </Text>
 
-                {/* Data Management */}
-                <View style={styles.dataSection}>
-                    <TouchableOpacity
-                        style={styles.exportButton}
-                        onPress={() => {
-                            lightImpact();
-                            navigation.navigate('Export');
-                        }}
-                    >
-                        <Text style={styles.exportButtonText}>Exportar Dados 📤</Text>
-                    </TouchableOpacity>
-                </View>
-
                 <View style={styles.bottomSpacer} />
             </ScrollView>
         </KeyboardAvoidingView>
@@ -764,21 +751,5 @@ const styles = StyleSheet.create({
     },
     bottomSpacer: {
         height: 96,
-    },
-    dataSection: {
-        padding: spacing.lg,
-        alignItems: 'center',
-    },
-    exportButton: {
-        paddingVertical: spacing.sm,
-        paddingHorizontal: spacing.lg,
-        borderRadius: borderRadius.full,
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.1)',
-        backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    },
-    exportButtonText: {
-        ...typography.bodySmall,
-        color: colors.textSecondary,
     },
 });
