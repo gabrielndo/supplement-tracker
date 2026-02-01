@@ -223,9 +223,23 @@ export const getStreak = async () => {
             const date = new Date(today);
             date.setDate(date.getDate() - i);
             const dateStr = date.toISOString().split('T')[0];
+            const dateTimestamp = date.getTime();
+
+            // Filter supplements that existed on this date
+            const supplementsExistingOnDate = supplements.filter(s => {
+                if (!s.addedAt) return true; // Legacy supplements without addedAt
+                const addedDate = new Date(s.addedAt);
+                return addedDate.getTime() <= dateTimestamp;
+            });
+
+            if (supplementsExistingOnDate.length === 0) {
+                // No supplements existed on this date
+                if (i > 0) break;
+                continue;
+            }
 
             const dailyLog = logs[dateStr] || [];
-            const allTaken = supplements.every(s => dailyLog.includes(s.id));
+            const allTaken = supplementsExistingOnDate.every(s => dailyLog.includes(s.id));
 
             if (allTaken) {
                 streak++;
