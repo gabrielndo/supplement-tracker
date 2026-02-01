@@ -259,7 +259,7 @@ export default function HomeScreen({ navigation }) {
                     <GlassCard variant={streak > 0 ? "streak" : "empty"}>
                         <View style={styles.streakRow}>
                             <Text style={[styles.streakEmoji, { opacity: streak > 0 ? 1 : 0.5 }]}>
-                                {streak > 0 ? "🔥" : "🔒"}
+                                🔥
                             </Text>
                             <View style={styles.streakInfo}>
                                 {streak > 0 ? (
@@ -269,8 +269,8 @@ export default function HomeScreen({ navigation }) {
                                     </>
                                 ) : (
                                     <>
-                                        <Text style={[styles.streakNumber, { color: colors.textSecondary, fontSize: 24 }]}>
-                                            Comece hoje!
+                                        <Text style={[styles.streakNumber, { color: colors.textSecondary }]}>
+                                            0
                                         </Text>
                                         <Text style={styles.streakLabel}>
                                             Registre um suplemento para iniciar
