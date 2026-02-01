@@ -25,6 +25,7 @@ import {
 import { calculateWaterGoal } from '../services/aiSuggestions';
 import { successFeedback, mediumImpact, lightImpact, errorFeedback } from '../services/haptics';
 import { checkAndNotify } from '../utils/achievements';
+import { scheduleStreakReminder } from '../services/notifications';
 
 // Animated Glass Card Component
 const GlassCard = ({ children, style, onPress, variant = 'default', disabled = false }) => {
@@ -159,7 +160,12 @@ export default function HomeScreen({ navigation }) {
     const streakScale = useRef(new Animated.Value(1)).current;
     const prevStreak = useRef(0);
 
-    // ... (loadData remains same, referencing existing function)
+    // Schedule streak reminder when supplements exist
+    useEffect(() => {
+        if (supplements.length > 0) {
+            scheduleStreakReminder();
+        }
+    }, [supplements.length]);
 
     useEffect(() => {
         if (streak > prevStreak.current && streak > 0) {

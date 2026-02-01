@@ -211,3 +211,40 @@ export const sendAchievementNotification = async (achievementTitle) => {
         `Parabéns! Você desbloqueou: ${achievementTitle}`
     );
 };
+
+/**
+ * Schedule daily streak reminder (checks at 9 PM if supplements are pending)
+ */
+export const scheduleStreakReminder = async () => {
+    // Cancel existing streak reminders first
+    await cancelStreakReminder();
+
+    const trigger = {
+        type: 'daily',
+        hour: 21, // 9 PM
+        minute: 0,
+        repeats: true,
+    };
+
+    await Notifications.scheduleNotificationAsync({
+        content: {
+            title: "Lembrete Diário 🔥",
+            body: "Não esqueça de registrar seus suplementos de hoje para manter sua sequência!",
+            categoryIdentifier: SUPPLEMENT_CATEGORY,
+            data: { type: 'streak_reminder' },
+        },
+        trigger,
+    });
+};
+
+/**
+ * Cancel streak reminder notifications
+ */
+export const cancelStreakReminder = async () => {
+    const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+    for (const item of scheduled) {
+        if (item.content.data?.type === 'streak_reminder') {
+            await Notifications.cancelScheduledNotificationAsync(item.identifier);
+        }
+    }
+};

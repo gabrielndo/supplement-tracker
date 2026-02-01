@@ -1,0 +1,42 @@
+﻿[
+  {
+    "id": "59b99dcc-5abe-4e9f-9a45-46e7eb6a4fbb",
+    "status": "IN_PROGRESS",
+    "platform": "ANDROID",
+    "artifacts": {},
+    "fingerprint": {
+      "id": "019c0ab6-082e-7ee7-9a4d-ddff63469620",
+      "hash": "28855332e58e7e0843d1e5364d093226e396b979"
+    },
+    "initiatingActor": {
+      "id": "521bacea-0bbe-4d3e-acfe-ac57392b6e63",
+      "displayName": "gabriel_ndo"
+    },
+    "logFiles": [
+      "https://job-logs.eascdn.net/production/59b99dcc-5abe-4e9f-9a45-46e7eb6a4fbb/1769801478761-3e1dfbea-d402-4e04-8648-8cf0f1e32fc7.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260130%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260130T193141Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=2d78dd9fccf2abcf7ed5761f1c135b95ef757e33dafa70d2f539a88b4e693bec6764d6d0f779315412eccbb6d23bbfe334e66d54015c4c85bf0253bb3a12fcc452ab4d82aba9e944988f9a5ad7f89f6a65a0e55a206d5a9d6e1677d6fc71fb94b2dc9851df028d98082131fe8d99e4d25b63e9ad588277d8ea07ec28f8dd3252cba0c27ac3bdff5d5707997a1c50a76fdcabb94b6df3f60c2ab2e567b457873b8e61d0fb1098fded924bf0e6a1e63875d2a71b54a2816af574f916df4d378bdb0268d0f7f297cf412a9b7f10ede1e50b4be96251ceade2e14bdc0926d8cdb5653019294bee942fed54fc6ebcb69bff1cf896ffc569bd5810fd9192b4c915e706",
+      "https://job-logs.eascdn.net/production/59b99dcc-5abe-4e9f-9a45-46e7eb6a4fbb/1769801484140-2003cd4f-5cfd-4290-9fb2-a8dd645add6f.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260130%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260130T193141Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=a1f82c9324d415143d1f52fc419acfcf277823e4f4fc4cb36c271d58fe187d3544bc4fc427c5ad6497160e468eaaab7813b607e4739c565edf70cb56a56cebb3d4f398f674ca44fc441758777af4d7f23f2d6cd5880bfb349a61d6dc82b2c52b0c7758a09dcd3e983b6b8849019ff74aea5cfc5573d3d544480eaba93a10f44270eacc9d5467c1496389727c584c5547cb7f3fb31f34c62e33e6d52051ef3845efcfde2f86e23260d6e284493c5bd12d5f3bd473305caf1512be54da15dbb0cd7b2fd765c2ffa04abe343cc8362c9ccc3d25e9623596e0745103127ca001e6e13296a8a65e7e354c1e8e65e1aa95920a2135ec74b321c60939db07c20e60e7c4",
+      "https://job-logs.eascdn.net/production/59b99dcc-5abe-4e9f-9a45-46e7eb6a4fbb/1769801484376-c223e5fb-7427-4f90-8611-0663724e3a8f.txt?X-Goog-Algorithm=GOOG4-RSA-SHA256&X-Goog-Credential=www-production%40exponentjs.iam.gserviceaccount.com%2F20260130%2Fauto%2Fstorage%2Fgoog4_request&X-Goog-Date=20260130T193141Z&X-Goog-Expires=900&X-Goog-SignedHeaders=host&X-Goog-Signature=5488030f69b2203df44085fdca03c3b3cffa21efc29b370ff63362f969e199bf4d48c5004cea688b81701706897c5b62e34660b45a13d1438ea1073f814a061ec8372f9f1e27f4c2980965f0952d4bff10e69016b8787283c42cea5f58f85525d95a4c5e267961794ebf06cbe87ee44fa4285862fa6e5675791723e00f77f64fa44ae61085a3e517712e41ec4de340d8f7c3a667b80a71065f5b0c7885f47366497ee545c79e3ef47d5ba03b05ab366ea967b86d82e4fb9cce36efbd4bb308eabe440cc568a6e6684af5b42efa5e86bda3d7cca40f33774e93dcf946221067d960428b4f9fd894d5f20acc75a8920c3552a5714dd90ec165717c14a91717f577"
+    ],
+    "project": {
+      "id": "5cd42645-f4b5-4983-adc5-336d38a21f04",
+      "name": "supplement-tracker",
+      "slug": "supplement-tracker",
+      "ownerAccount": {
+        "id": "3f66f7df-5b89-4068-bf8b-4b4b13ccde0e",
+        "name": "gabriel_ndo"
+      }
+    },
+    "distribution": "STORE",
+    "buildProfile": "preview",
+    "sdkVersion": "54.0.0",
+    "appVersion": "1.0.0",
+    "appBuildVersion": "1",
+    "gitCommitHash": "ffc9d42f8603d3af8d62f392afb724999e1a15db",
+    "gitCommitMessage": "Add eas-cli to dependencies",
+    "priority": "NORMAL",
+    "createdAt": "2026-01-30T19:31:18.561Z",
+    "updatedAt": "2026-01-30T19:31:26.396Z",
+    "expirationDate": "2026-03-01T19:31:18.597Z",
+    "isForIosSimulator": false
+  }
+]
