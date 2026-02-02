@@ -204,34 +204,6 @@ export default function WelcomeScreen({ onComplete }) {
 
                 <View style={styles.buttonsContainer}>
                     <TouchableOpacity
-                        style={styles.googleButton}
-                        onPress={() => {
-                            lightImpact();
-                            promptAsync();
-                        }}
-                        disabled={loading || !request}
-                    >
-                        <LinearGradient
-                            colors={['rgba(255, 255, 255, 0.15)', 'rgba(255, 255, 255, 0.08)']}
-                            style={StyleSheet.absoluteFill}
-                        />
-                        {loading ? (
-                            <ActivityIndicator color={colors.text} />
-                        ) : (
-                            <>
-                                <Text style={styles.googleIcon}>G</Text>
-                                <Text style={styles.googleButtonText}>Entrar com Google</Text>
-                            </>
-                        )}
-                    </TouchableOpacity>
-
-                    <View style={styles.divider}>
-                        <View style={styles.dividerLine} />
-                        <Text style={styles.dividerText}>ou</Text>
-                        <View style={styles.dividerLine} />
-                    </View>
-
-                    <TouchableOpacity
                         style={styles.manualButton}
                         onPress={() => {
                             lightImpact();
@@ -245,7 +217,7 @@ export default function WelcomeScreen({ onComplete }) {
                             end={{ x: 1, y: 0 }}
                             style={StyleSheet.absoluteFill}
                         />
-                        <Text style={styles.manualButtonText}>Criar Conta Pessoal</Text>
+                        <Text style={styles.manualButtonText}>Começar Agora</Text>
                     </TouchableOpacity>
                 </View>
 
