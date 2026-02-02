@@ -13,13 +13,9 @@ import {
     Image,
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Google from 'expo-auth-session/providers/google';
-import * as WebBrowser from 'expo-web-browser';
 import { colors, spacing, borderRadius, typography } from '../styles/theme';
 import { saveAuthUser } from '../services/authStorage';
 import { successFeedback, lightImpact } from '../services/haptics';
-
-WebBrowser.maybeCompleteAuthSession();
 
 // Glass Card Component
 const GlassCard = ({ children, style }) => (
@@ -41,50 +37,7 @@ export default function WelcomeScreen({ onComplete }) {
     const [email, setEmail] = useState('');
     const [loading, setLoading] = useState(false);
 
-    // Google Sign-In configuration
-    const [request, response, promptAsync] = Google.useAuthRequest({
-        androidClientId: 'YOUR_ANDROID_CLIENT_ID.apps.googleusercontent.com',
-        iosClientId: 'YOUR_IOS_CLIENT_ID.apps.googleusercontent.com',
-        webClientId: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com',
-    });
 
-    React.useEffect(() => {
-        if (response?.type === 'success') {
-            handleGoogleSignIn(response.authentication.accessToken);
-        }
-    }, [response]);
-
-    const handleGoogleSignIn = async (token) => {
-        try {
-            setLoading(true);
-            // Fetch user info from Google
-            const userInfoResponse = await fetch(
-                'https://www.googleapis.com/userinfo/v2/me',
-                {
-                    headers: { Authorization: `Bearer ${token}` },
-                }
-            );
-
-            const userInfo = await userInfoResponse.json();
-
-            const user = {
-                id: userInfo.id,
-                name: userInfo.name,
-                email: userInfo.email,
-                photoUrl: userInfo.picture,
-                authMethod: 'google',
-            };
-
-            await saveAuthUser(user);
-            successFeedback();
-            onComplete();
-        } catch (error) {
-            console.error('Google sign-in error:', error);
-            Alert.alert('Erro', 'Não foi possível fazer login com Google');
-        } finally {
-            setLoading(false);
-        }
-    };
 
     const handleManualSignup = async () => {
         if (!name.trim()) {
