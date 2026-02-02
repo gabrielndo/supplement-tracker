@@ -1,13 +1,19 @@
 {
     "cli": {
-        "version": ">= 7.0.0"
+        "version": ">= 7.0.0",
+        "appVersionSource": "remote"
     },
     "build": {
         "preview": {
+            "distribution": "internal",
             "android": {
                 "buildType": "apk"
             }
         },
-        "production": {}
+        "production": {
+            "android": {
+                "buildType": "apk"
+            }
+        }
     }
 }
