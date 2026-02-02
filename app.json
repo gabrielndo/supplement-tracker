@@ -23,7 +23,6 @@
         "backgroundColor": "#0f172a"
       },
       "package": "com.supplementtracker.app",
-      "versionCode": 1,
       "permissions": [
         "RECEIVE_BOOT_COMPLETED",
         "VIBRATE",
