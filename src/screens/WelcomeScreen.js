@@ -196,9 +196,9 @@ export default function WelcomeScreen({ onComplete }) {
                         style={styles.logoImage}
                         resizeMode="contain"
                     />
-                    <Text style={styles.appName}>Supplement Tracker</Text>
+                    <Text style={styles.appName}>MeusSuple</Text>
                     <Text style={styles.tagline}>
-                        Monitore seus suplementos e água com inteligência
+                        Rastreador e lembrete de suplementos
                     </Text>
                 </View>
 
