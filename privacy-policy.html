@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Política de Privacidade - MeusSuple</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .app-name {
+            font-size: 1.2em;
+            color: #764ba2;
+            font-weight: 600;
+        }
+        
+        .update-date {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        
+        h2 {
+            color: #667eea;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.8em;
+        }
+        
+        h3 {
+            color: #764ba2;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.3em;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        
+        ul {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+        
+        li {
+            margin-bottom: 10px;
+        }
+        
+        .highlight {
+            background: #f0f4ff;
+            padding: 20px;
+            border-left: 4px solid #667eea;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        
+        .contact {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-top: 40px;
+            text-align: center;
+        }
+        
+        .contact h2 {
+            color: white;
+            margin-top: 0;
+        }
+        
+        .contact a {
+            color: #fff;
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Política de Privacidade</h1>
+            <div class="app-name">MeusSuple - Rastreador e Lembrete</div>
+            <div class="update-date">Última atualização: 15 de fevereiro de 2026</div>
+        </div>
+
+        <h2>1. Introdução</h2>
+        <p>
+            Bem-vindo ao <strong>MeusSuple</strong>! Esta Política de Privacidade descreve como lidamos com suas informações pessoais quando você usa nosso aplicativo.
+        </p>
+        
+        <div class="highlight">
+            <strong>Em resumo:</strong> O MeusSuple foi projetado com privacidade em mente. NÃO coletamos, armazenamos ou compartilhamos seus dados pessoais em servidores externos. Tudo fica no seu dispositivo!
+        </div>
+
+        <h2>2. Coleta de Dados</h2>
+        <p>
+            O MeusSuple <strong>NÃO coleta</strong> nenhum dado pessoal identificável. Não temos servidores, não fazemos rastreamento, e não compartilhamos suas informações com terceiros.
+        </p>
+
+        <h3>2.1 Dados que você insere no app:</h3>
+        <ul>
+            <li><strong>Perfil pessoal:</strong> nome, gênero, data de nascimento, peso, altura, objetivo</li>
+            <li><strong>Suplementos:</strong> lista de suplementos, horários de consumo</li>
+            <li><strong>Consumo de água:</strong> registro diário de hidratação</li>
+            <li><strong>Histórico:</strong> dados de consumo ao longo do tempo</li>
+        </ul>
+
+        <h3>2.2 Onde esses dados ficam?</h3>
+        <p>
+            Todos os dados são armazenados <strong>LOCALMENTE</strong> no seu dispositivo usando a tecnologia AsyncStorage (armazenamento local do React Native). Eles <strong>NUNCA</strong> saem do seu celular.
+        </p>
+
+        <h2>3. Uso dos Dados</h2>
+        <p>
+            Os dados que você insere no app são usados exclusivamente para:
+        </p>
+        <ul>
+            <li>Exibir seu perfil e estatísticas pessoais</li>
+            <li>Calcular metas de consumo (água, IMC)</li>
+            <li>Enviar lembretes de suplementos e água</li>
+            <li>Acompanhar seu progresso e streaks</li>
+            <li>Gerar gráficos e estatísticas</li>
+        </ul>
+
+        <h2>4. Compartilhamento de Dados</h2>
+        <p>
+            <strong>Não compartilhamos</strong> seus dados com ninguém porque <strong>não temos acesso</strong> a eles! Como tudo fica armazenado localmente no seu dispositivo, não há dados para compartilhar.
+        </p>
+
+        <h2>5. Permissões do Aplicativo</h2>
+        <p>
+            O MeusSuple solicita as seguintes permissões do Android:
+        </p>
+
+        <h3>5.1 Notificações (NOTIFICATIONS)</h3>
+        <p>
+            <strong>Por quê:</strong> Para enviar lembretes de suplementos e água nos horários configurados.
+        </p>
+
+        <h3>5.2 Vibração (VIBRATE)</h3>
+        <p>
+            <strong>Por quê:</strong> Para fornecer feedback tátil (haptic feedback) quando você interage com o app.
+        </p>
+
+        <h3>5.3 Inicialização automática (RECEIVE_BOOT_COMPLETED)</h3>
+        <p>
+            <strong>Por quê:</strong> Para restaurar seus lembretes agendados após reinicializar o dispositivo.
+        </p>
+
+        <h3>5.4 Alarmes exatos (SCHEDULE_EXACT_ALARM)</h3>
+        <p>
+            <strong>Por quê:</strong> Para agendar notificações nos horários exatos que você configurou.
+        </p>
+
+        <h2>6. Serviços de Terceiros</h2>
+        <p>
+            O MeusSuple <strong>NÃO utiliza</strong> nenhum serviço de terceiros para:
+        </p>
+        <ul>
+            <li>Analytics (Google Analytics, Firebase Analytics, etc.)</li>
+            <li>Publicidade</li>
+            <li>Rastreamento de comportamento</li>
+            <li>Crash reporting externo</li>
+        </ul>
+
+        <h2>7. Segurança</h2>
+        <p>
+            Como todos os dados ficam armazenados localmente no seu dispositivo, a segurança depende das proteções nativas do seu sistema operacional Android. Recomendamos:
+        </p>
+        <ul>
+            <li>Manter seu dispositivo atualizado</li>
+            <li>Usar bloqueio de tela (PIN, senha, biometria)</li>
+            <li>Fazer backup regular do seu dispositivo</li>
+        </ul>
+
+        <h2>8. Exclusão de Dados</h2>
+        <p>
+            Como não armazenamos dados em servidores, você tem <strong>controle total</strong>:
+        </p>
+        <ul>
+            <li><strong>Desinstalar o app:</strong> Remove todos os dados permanentemente</li>
+            <li><strong>Logout:</strong> Apaga seus dados locais instantaneamente</li>
+            <li><strong>Limpar dados do app:</strong> Via configurações do Android</li>
+        </ul>
+
+        <h2>9. Direitos dos Usuários (LGPD)</h2>
+        <p>
+            Em conformidade com a Lei Geral de Proteção de Dados (LGPD), você tem direito a:
+        </p>
+        <ul>
+            <li><strong>Acesso:</strong> Ver todos os seus dados (diretamente no app)</li>
+            <li><strong>Correção:</strong> Editar informações incorretas (no perfil)</li>
+            <li><strong>Exclusão:</strong> Apagar seus dados a qualquer momento (logout)</li>
+            <li><strong>Portabilidade:</strong> Exportar seus dados (recurso planejado)</li>
+        </ul>
+
+        <div class="highlight">
+            <strong>Importante:</strong> Como não coletamos dados, a maioria desses direitos já são garantidos por padrão - você sempre teve controle total sobre suas informações!
+        </div>
+
+        <h2>10. Crianças</h2>
+        <p>
+            O MeusSuple é destinado a usuários de todas as idades. Como não coletamos dados pessoais, não há restrições específicas quanto ao uso por menores de idade. Recomendamos supervisão dos pais ou responsáveis.
+        </p>
+
+        <h2>11. Alterações nesta Política</h2>
+        <p>
+            Podemos atualizar esta Política de Privacidade ocasionalmente. Mudanças serão notificadas através de:
+        </p>
+        <ul>
+            <li>Atualização da data no topo desta página</li>
+            <li>Notificação dentro do aplicativo (se aplicável)</li>
+        </ul>
+
+        <h2>12. Consentimento</h2>
+        <p>
+            Ao usar o MeusSuple, você concorda com esta Política de Privacidade.
+        </p>
+
+        <div class="contact">
+            <h2>Contato</h2>
+            <p>
+                Se você tiver dúvidas sobre esta Política de Privacidade, entre em contato:
+            </p>
+            <p>
+                <strong>Email:</strong> <a href="mailto:contato@meussuple.app">contato@meussuple.app</a>
+            </p>
+            <p style="margin-top: 20px; font-size: 0.9em;">
+                MeusSuple - Rastreador e Lembrete<br>
+                Desenvolvido com ❤️ para sua saúde
+            </p>
+        </div>
+    </div>
+</body>
+</html>
