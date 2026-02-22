@@ -14,14 +14,14 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, typography } from '../styles/theme';
-import { saveAuthUser } from '../services/authStorage';
+import { saveAuthUser, registerWithEmail, loginWithEmail } from '../services/authStorage';
 import { successFeedback, lightImpact } from '../services/haptics';
 
-// Glass Card Component
+// ─── Glass Card ──────────────────────────────────────────────────────────────
 const GlassCard = ({ children, style }) => (
     <View style={[styles.glassCard, style]}>
         <LinearGradient
-            colors={['rgba(255, 255, 255, 0.08)', 'rgba(255, 255, 255, 0.04)', 'rgba(255, 255, 255, 0.01)']}
+            colors={['rgba(255,255,255,0.08)', 'rgba(255,255,255,0.04)', 'rgba(255,255,255,0.01)']}
             start={{ x: 0, y: 0 }}
             end={{ x: 0, y: 1 }}
             style={StyleSheet.absoluteFill}
@@ -31,85 +31,147 @@ const GlassCard = ({ children, style }) => (
     </View>
 );
 
+// ─── Input ────────────────────────────────────────────────────────────────────
+const Input = ({ label, icon, ...props }) => (
+    <View style={styles.inputWrapper}>
+        <Text style={styles.inputLabel}>{label}</Text>
+        <View style={styles.inputContainer}>
+            {icon ? <Text style={styles.inputIcon}>{icon}</Text> : null}
+            <TextInput
+                style={[styles.input, icon && { paddingLeft: 40 }]}
+                placeholderTextColor="rgba(255,255,255,0.3)"
+                autoCapitalize="none"
+                {...props}
+            />
+        </View>
+    </View>
+);
+
+// ─── Main Component ───────────────────────────────────────────────────────────
 export default function WelcomeScreen({ onComplete }) {
-    const [showManualSignup, setShowManualSignup] = useState(false);
+    // mode: 'landing' | 'login' | 'signup'
+    const [mode, setMode] = useState('landing');
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
+    const validateEmail = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim());
 
-
-    const handleManualSignup = async () => {
-        if (!name.trim()) {
-            Alert.alert('Atenção', 'Por favor, informe seu nome');
+    // ── Login ─────────────────────────────────────────────────────────────────
+    const handleLogin = async () => {
+        lightImpact();
+        if (!validateEmail(email)) {
+            Alert.alert('E-mail inválido', 'Digite um e-mail válido.');
             return;
         }
-
-        try {
-            setLoading(true);
-            const user = {
-                id: `manual_${Date.now()}`,
-                name: name.trim(),
-                email: email.trim() || null,
-                photoUrl: null,
-                authMethod: 'manual',
-            };
-
-            await saveAuthUser(user);
+        if (password.length < 6) {
+            Alert.alert('Senha curta', 'A senha deve ter pelo menos 6 caracteres.');
+            return;
+        }
+        setLoading(true);
+        const result = await loginWithEmail(email, password);
+        setLoading(false);
+        if (result.success) {
             successFeedback();
             onComplete();
-        } catch (error) {
-            console.error('Signup error:', error);
-            Alert.alert('Erro', 'Não foi possível criar conta');
-        } finally {
-            setLoading(false);
+        } else {
+            Alert.alert('Erro ao entrar', result.error);
         }
     };
 
-    if (showManualSignup) {
+    // ── Signup ────────────────────────────────────────────────────────────────
+    const handleSignup = async () => {
+        lightImpact();
+        if (!name.trim()) {
+            Alert.alert('Nome obrigatório', 'Por favor, informe seu nome.');
+            return;
+        }
+        if (!validateEmail(email)) {
+            Alert.alert('E-mail inválido', 'Digite um e-mail válido.');
+            return;
+        }
+        if (password.length < 6) {
+            Alert.alert('Senha curta', 'A senha deve ter pelo menos 6 caracteres.');
+            return;
+        }
+        if (password !== confirmPassword) {
+            Alert.alert('Senhas diferentes', 'As senhas não coincidem.');
+            return;
+        }
+        setLoading(true);
+        const result = await registerWithEmail(name, email, password);
+        setLoading(false);
+        if (result.success) {
+            successFeedback();
+            onComplete();
+        } else {
+            Alert.alert('Erro ao criar conta', result.error);
+        }
+    };
+
+    // ── Google (placeholder) ──────────────────────────────────────────────────
+    const handleGoogle = () => {
+        lightImpact();
+        Alert.alert(
+            'Em breve',
+            'O login com Google estará disponível em breve. Configure suas credenciais no Google Cloud Console.',
+            [{ text: 'OK' }]
+        );
+    };
+
+    const resetForm = (newMode) => {
+        setEmail('');
+        setPassword('');
+        setConfirmPassword('');
+        setName('');
+        setShowPassword(false);
+        setMode(newMode);
+    };
+
+    // ── Landing ───────────────────────────────────────────────────────────────
+    if (mode === 'landing') {
         return (
-            <KeyboardAvoidingView
-                style={styles.container}
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            >
-                <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
-                    <View style={styles.content}>
-                        <Text style={styles.title}>Criar Conta Pessoal</Text>
-                        <Text style={styles.subtitle}>
-                            Informe seus dados para começar
-                        </Text>
+            <View style={styles.container}>
+                <LinearGradient
+                    colors={['#0f172a', '#1e1b4b', '#0f172a']}
+                    style={StyleSheet.absoluteFill}
+                />
+                <View style={styles.landingContent}>
+                    {/* Logo */}
+                    <View style={styles.logoArea}>
+                        <Image
+                            source={require('../../assets/logo.png')}
+                            style={styles.logo}
+                            resizeMode="contain"
+                        />
+                        <Text style={styles.appName}>MeusSuple</Text>
+                        <Text style={styles.tagline}>Rastreador e lembrete de suplementos</Text>
+                    </View>
 
-                        <GlassCard style={styles.inputCard}>
-                            <Text style={styles.label}>Nome *</Text>
-                            <TextInput
-                                style={styles.input}
-                                value={name}
-                                onChangeText={setName}
-                                placeholder="Seu nome completo"
-                                placeholderTextColor={colors.textMuted}
-                                autoFocus
-                                onFocus={() => lightImpact()}
-                            />
-                        </GlassCard>
+                    {/* Buttons */}
+                    <View style={styles.buttonArea}>
+                        {/* Google */}
+                        <TouchableOpacity style={styles.googleButton} onPress={handleGoogle}>
+                            <GlassCard style={styles.googleCard}>
+                                <Text style={styles.googleIcon}>G</Text>
+                                <Text style={styles.googleText}>Continuar com Google</Text>
+                            </GlassCard>
+                        </TouchableOpacity>
 
-                        <GlassCard style={styles.inputCard}>
-                            <Text style={styles.label}>Email (opcional)</Text>
-                            <TextInput
-                                style={styles.input}
-                                value={email}
-                                onChangeText={setEmail}
-                                placeholder="seu@email.com"
-                                placeholderTextColor={colors.textMuted}
-                                keyboardType="email-address"
-                                autoCapitalize="none"
-                                onFocus={() => lightImpact()}
-                            />
-                        </GlassCard>
+                        {/* Divider */}
+                        <View style={styles.divider}>
+                            <View style={styles.dividerLine} />
+                            <Text style={styles.dividerText}>ou</Text>
+                            <View style={styles.dividerLine} />
+                        </View>
 
+                        {/* Email login */}
                         <TouchableOpacity
-                            style={styles.primaryButton}
-                            onPress={handleManualSignup}
-                            disabled={loading}
+                            style={styles.emailButton}
+                            onPress={() => resetForm('login')}
                         >
                             <LinearGradient
                                 colors={['#818cf8', '#6366f1', '#4f46e5']}
@@ -117,209 +179,368 @@ export default function WelcomeScreen({ onComplete }) {
                                 end={{ x: 1, y: 0 }}
                                 style={StyleSheet.absoluteFill}
                             />
-                            {loading ? (
-                                <ActivityIndicator color={colors.text} />
-                            ) : (
-                                <Text style={styles.primaryButtonText}>Continuar →</Text>
-                            )}
+                            <Text style={styles.emailButtonIcon}>✉️</Text>
+                            <Text style={styles.emailButtonText}>Entrar com E-mail</Text>
                         </TouchableOpacity>
 
+                        {/* Create account */}
                         <TouchableOpacity
-                            style={styles.backButton}
-                            onPress={() => {
-                                lightImpact();
-                                setShowManualSignup(false);
-                            }}
-                            disabled={loading}
+                            style={styles.signupLink}
+                            onPress={() => resetForm('signup')}
                         >
-                            <Text style={styles.backButtonText}>← Voltar</Text>
+                            <Text style={styles.signupLinkText}>
+                                Não tem conta?{' '}
+                                <Text style={styles.signupLinkHighlight}>Criar agora</Text>
+                            </Text>
                         </TouchableOpacity>
                     </View>
-                </ScrollView>
-            </KeyboardAvoidingView>
+                </View>
+            </View>
         );
     }
 
+    // ── Login / Signup Form ───────────────────────────────────────────────────
+    const isLogin = mode === 'login';
+
     return (
-        <View style={styles.container}>
-            <View style={styles.content}>
-                <View style={styles.logoContainer}>
-                    <Image
-                        source={require('../../assets/logo.png')}
-                        style={styles.logoImage}
-                        resizeMode="contain"
-                    />
-                    <Text style={styles.appName}>MeusSuple</Text>
-                    <Text style={styles.tagline}>
-                        Rastreador e lembrete de suplementos
-                    </Text>
-                </View>
+        <KeyboardAvoidingView
+            style={styles.container}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        >
+            <LinearGradient
+                colors={['#0f172a', '#1e1b4b', '#0f172a']}
+                style={StyleSheet.absoluteFill}
+            />
+            <ScrollView
+                style={styles.scrollView}
+                contentContainerStyle={styles.formContent}
+                showsVerticalScrollIndicator={false}
+                keyboardShouldPersistTaps="handled"
+            >
+                {/* Back button */}
+                <TouchableOpacity
+                    style={styles.backButton}
+                    onPress={() => resetForm('landing')}
+                >
+                    <Text style={styles.backButtonText}>← Voltar</Text>
+                </TouchableOpacity>
 
-                <View style={styles.buttonsContainer}>
-                    <TouchableOpacity
-                        style={styles.manualButton}
-                        onPress={() => {
-                            lightImpact();
-                            setShowManualSignup(true);
-                        }}
-                        disabled={loading}
-                    >
-                        <LinearGradient
-                            colors={['#818cf8', '#6366f1', '#4f46e5']}
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 0 }}
-                            style={StyleSheet.absoluteFill}
-                        />
-                        <Text style={styles.manualButtonText}>Começar Agora</Text>
-                    </TouchableOpacity>
-                </View>
-
-                <Text style={styles.disclaimer}>
-                    Ao continuar, você concorda com nossos termos de uso
+                {/* Header */}
+                <Text style={styles.formTitle}>
+                    {isLogin ? '👋 Bem-vindo!' : '🚀 Criar Conta'}
                 </Text>
-            </View>
-        </View>
+                <Text style={styles.formSubtitle}>
+                    {isLogin
+                        ? 'Entre com seus dados para continuar'
+                        : 'Preencha os dados para começar'}
+                </Text>
+
+                {/* Form Card */}
+                <GlassCard style={styles.formCard}>
+                    {!isLogin && (
+                        <Input
+                            label="Nome"
+                            icon="👤"
+                            value={name}
+                            onChangeText={setName}
+                            placeholder="Seu nome"
+                            autoCapitalize="words"
+                        />
+                    )}
+
+                    <Input
+                        label="E-mail"
+                        icon="✉️"
+                        value={email}
+                        onChangeText={setEmail}
+                        placeholder="seu@email.com"
+                        keyboardType="email-address"
+                    />
+
+                    <Input
+                        label="Senha"
+                        icon="🔒"
+                        value={password}
+                        onChangeText={setPassword}
+                        placeholder="Mínimo 6 caracteres"
+                        secureTextEntry={!showPassword}
+                    />
+
+                    {!isLogin && (
+                        <Input
+                            label="Confirmar senha"
+                            icon="🔒"
+                            value={confirmPassword}
+                            onChangeText={setConfirmPassword}
+                            placeholder="Repita a senha"
+                            secureTextEntry={!showPassword}
+                        />
+                    )}
+
+                    {/* Show/hide password */}
+                    <TouchableOpacity
+                        style={styles.showPasswordRow}
+                        onPress={() => setShowPassword(!showPassword)}
+                    >
+                        <Text style={styles.showPasswordText}>
+                            {showPassword ? '🙈 Ocultar senha' : '👁️ Mostrar senha'}
+                        </Text>
+                    </TouchableOpacity>
+                </GlassCard>
+
+                {/* Submit */}
+                <TouchableOpacity
+                    style={styles.submitButton}
+                    onPress={isLogin ? handleLogin : handleSignup}
+                    disabled={loading}
+                >
+                    <LinearGradient
+                        colors={['#818cf8', '#6366f1', '#4f46e5']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={StyleSheet.absoluteFill}
+                    />
+                    {loading
+                        ? <ActivityIndicator color="#fff" />
+                        : <Text style={styles.submitButtonText}>
+                            {isLogin ? 'Entrar →' : 'Criar Conta →'}
+                        </Text>
+                    }
+                </TouchableOpacity>
+
+                {/* Switch mode */}
+                <TouchableOpacity
+                    style={styles.switchMode}
+                    onPress={() => resetForm(isLogin ? 'signup' : 'login')}
+                >
+                    <Text style={styles.switchModeText}>
+                        {isLogin
+                            ? 'Não tem conta? '
+                            : 'Já tem conta? '}
+                        <Text style={styles.switchModeHighlight}>
+                            {isLogin ? 'Criar agora' : 'Entrar'}
+                        </Text>
+                    </Text>
+                </TouchableOpacity>
+
+                {/* Disclaimer */}
+                <Text style={styles.disclaimer}>
+                    Seus dados ficam armazenados localmente no seu dispositivo 🔒
+                </Text>
+            </ScrollView>
+        </KeyboardAvoidingView>
     );
 }
 
+// ─── Styles ───────────────────────────────────────────────────────────────────
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: colors.background,
+        backgroundColor: '#0f172a',
     },
-    scrollView: {
+
+    // Landing
+    landingContent: {
         flex: 1,
-    },
-    content: {
-        flex: 1,
+        justifyContent: 'space-between',
         padding: spacing.xl,
-        justifyContent: 'center',
+        paddingTop: 80,
+        paddingBottom: 48,
     },
-    logoContainer: {
+    logoArea: {
         alignItems: 'center',
-        marginBottom: spacing.xxxl,
     },
-    logoImage: {
-        width: 120,
-        height: 120,
-        marginBottom: spacing.lg,
+    logo: {
+        width: 110,
+        height: 110,
+        marginBottom: spacing.md,
     },
     appName: {
-        ...typography.h1,
-        fontSize: 32,
-        fontWeight: 'bold',
-        marginBottom: spacing.sm,
+        fontSize: 36,
+        fontWeight: '800',
+        color: colors.text,
+        letterSpacing: -1,
     },
     tagline: {
         ...typography.body,
-        textAlign: 'center',
         color: colors.textSecondary,
-        maxWidth: 280,
+        marginTop: spacing.xs,
+        textAlign: 'center',
     },
-    title: {
-        ...typography.h2,
-        marginBottom: spacing.xs,
-    },
-    subtitle: {
-        ...typography.bodySmall,
-        marginBottom: spacing.xl,
-    },
-    buttonsContainer: {
+    buttonArea: {
         gap: spacing.md,
     },
     googleButton: {
+        borderRadius: borderRadius.lg,
+        overflow: 'hidden',
+    },
+    googleCard: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        padding: spacing.lg,
-        borderRadius: borderRadius.lg,
-        borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.2)',
-        overflow: 'hidden',
+        padding: spacing.md,
         gap: spacing.sm,
     },
     googleIcon: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: colors.text,
+        fontSize: 20,
+        fontWeight: '900',
+        color: '#fff',
+        fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
     },
-    googleButtonText: {
-        ...typography.body,
+    googleText: {
+        color: colors.text,
         fontWeight: '600',
+        fontSize: 16,
     },
     divider: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginVertical: spacing.md,
+        gap: spacing.sm,
     },
     dividerLine: {
         flex: 1,
         height: 1,
-        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        backgroundColor: 'rgba(255,255,255,0.1)',
     },
     dividerText: {
-        ...typography.bodySmall,
+        color: colors.textMuted,
+        fontSize: 13,
+    },
+    emailButton: {
+        borderRadius: borderRadius.lg,
+        overflow: 'hidden',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: spacing.md,
+        gap: spacing.sm,
+    },
+    emailButtonIcon: {
+        fontSize: 18,
+    },
+    emailButtonText: {
+        color: '#fff',
+        fontWeight: '700',
+        fontSize: 16,
+    },
+    signupLink: {
+        alignItems: 'center',
+        marginTop: spacing.xs,
+    },
+    signupLinkText: {
         color: colors.textSecondary,
-        marginHorizontal: spacing.md,
+        fontSize: 15,
     },
-    manualButton: {
-        padding: spacing.lg,
-        borderRadius: borderRadius.lg,
-        alignItems: 'center',
-        overflow: 'hidden',
+    signupLinkHighlight: {
+        color: colors.primary,
+        fontWeight: '700',
     },
-    manualButtonText: {
-        ...typography.body,
-        fontWeight: 'bold',
+
+    // Form
+    scrollView: {
+        flex: 1,
     },
-    primaryButton: {
-        padding: spacing.lg,
-        borderRadius: borderRadius.lg,
-        alignItems: 'center',
-        marginTop: spacing.lg,
-        overflow: 'hidden',
-    },
-    primaryButtonText: {
-        ...typography.body,
-        fontWeight: 'bold',
+    formContent: {
+        padding: spacing.xl,
+        paddingTop: 60,
+        paddingBottom: 40,
     },
     backButton: {
-        padding: spacing.md,
-        alignItems: 'center',
-        marginTop: spacing.md,
+        marginBottom: spacing.lg,
     },
     backButtonText: {
+        color: colors.textSecondary,
+        fontSize: 15,
+    },
+    formTitle: {
+        fontSize: 30,
+        fontWeight: '800',
+        color: colors.text,
+        marginBottom: spacing.xs,
+    },
+    formSubtitle: {
         ...typography.body,
         color: colors.textSecondary,
+        marginBottom: spacing.xl,
     },
     glassCard: {
-        borderRadius: borderRadius.lg,
+        borderRadius: borderRadius.xl,
         borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        borderColor: 'rgba(255,255,255,0.1)',
         overflow: 'hidden',
-        padding: spacing.md,
+        padding: spacing.lg,
     },
-    inputCard: {
+    formCard: {
         marginBottom: spacing.md,
     },
-    label: {
-        ...typography.bodySmall,
-        marginBottom: spacing.sm,
+    inputWrapper: {
+        marginBottom: spacing.md,
+    },
+    inputLabel: {
         color: colors.textSecondary,
+        fontSize: 13,
+        fontWeight: '600',
+        marginBottom: spacing.xs,
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
+    },
+    inputContainer: {
+        position: 'relative',
+        justifyContent: 'center',
+    },
+    inputIcon: {
+        position: 'absolute',
+        left: 12,
+        zIndex: 1,
+        fontSize: 16,
     },
     input: {
-        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        backgroundColor: 'rgba(255,255,255,0.06)',
         borderRadius: borderRadius.md,
         padding: spacing.md,
         color: colors.text,
         fontSize: 16,
         borderWidth: 1,
-        borderColor: 'rgba(255, 255, 255, 0.1)',
+        borderColor: 'rgba(255,255,255,0.1)',
+        paddingLeft: 40,
+        ...Platform.select({ web: { outlineStyle: 'none' } }),
+    },
+    showPasswordRow: {
+        alignItems: 'flex-end',
+        marginTop: spacing.xs,
+    },
+    showPasswordText: {
+        color: colors.textSecondary,
+        fontSize: 13,
+    },
+    submitButton: {
+        borderRadius: borderRadius.lg,
+        overflow: 'hidden',
+        padding: spacing.lg,
+        alignItems: 'center',
+        marginBottom: spacing.md,
+    },
+    submitButtonText: {
+        color: '#fff',
+        fontWeight: '800',
+        fontSize: 17,
+    },
+    switchMode: {
+        alignItems: 'center',
+        marginBottom: spacing.lg,
+    },
+    switchModeText: {
+        color: colors.textSecondary,
+        fontSize: 15,
+    },
+    switchModeHighlight: {
+        color: colors.primary,
+        fontWeight: '700',
     },
     disclaimer: {
-        ...typography.caption,
         textAlign: 'center',
-        marginTop: spacing.xl,
-        color: colors.textSecondary,
+        color: colors.textMuted,
+        fontSize: 12,
+        lineHeight: 18,
     },
 });
