@@ -78,6 +78,8 @@ const GlassCard = ({ children, style, onPress, onLongPress, variant = 'default' 
     );
 };
 
+const EMOJI_OPTIONS = ['💊', '🧪', '🍃', '🌿', '🧬', '💉', '🫀', '🦷', '🦴', '🏋️', '🥗', '🫐', '🍋', '🧄', '🫚', '🥑', '🌾', '🫘', '🧅', '🍄', '⚗️', '🔬', '🧲', '⚡', '🌡️', '💧', '🌊', '🔥', '❄️', '✨'];
+
 export default function SupplementsScreen() {
     const [profile, setProfile] = useState(null);
     const [supplements, setSupplements] = useState([]);
@@ -89,6 +91,15 @@ export default function SupplementsScreen() {
     const [reminderTime, setReminderTime] = useState('08:00');
     const [customReminderTime, setCustomReminderTime] = useState('');
     const [showCustomTimeInput, setShowCustomTimeInput] = useState(false);
+
+    // Custom supplement state
+    const [customModalVisible, setCustomModalVisible] = useState(false);
+    const [customName, setCustomName] = useState('');
+    const [customIcon, setCustomIcon] = useState('💊');
+    const [customUnit, setCustomUnit] = useState('mg');
+    const [customDosageAmount, setCustomDosageAmount] = useState('');
+    const [customSupplementId, setCustomSupplementId] = useState(null);
+    const [customReminderTimeNew, setCustomReminderTimeNew] = useState('08:00');
 
     useFocusEffect(
         useCallback(() => {
@@ -118,6 +129,68 @@ export default function SupplementsScreen() {
         setShowCustomTimeInput(false);
         setCustomReminderTime('');
         setModalVisible(true);
+    };
+
+    const openCustomModal = (existing = null) => {
+        lightImpact();
+        if (existing) {
+            // Edit mode
+            setCustomSupplementId(existing.id);
+            setCustomName(existing.name);
+            setCustomIcon(existing.icon);
+            setCustomDosageAmount(existing.dosage.toString());
+            setCustomUnit(existing.unit);
+            setCustomReminderTimeNew(existing.reminderTime || '08:00');
+        } else {
+            // Create mode
+            setCustomSupplementId(null);
+            setCustomName('');
+            setCustomIcon('💊');
+            setCustomDosageAmount('');
+            setCustomUnit('mg');
+            setCustomReminderTimeNew('08:00');
+        }
+        setCustomModalVisible(true);
+    };
+
+    const handleAddCustomSupplement = async () => {
+        if (!customName.trim()) {
+            lightImpact();
+            Alert.alert('Campo obrigatório', 'Digite o nome do suplemento.');
+            return;
+        }
+        const dosageNum = parseFloat(customDosageAmount);
+        if (isNaN(dosageNum) || dosageNum <= 0) {
+            lightImpact();
+            Alert.alert('Dosagem inválida', 'Digite uma dosagem válida.');
+            return;
+        }
+
+        const id = customSupplementId || `custom-${Date.now()}`;
+        const newSupplement = {
+            id,
+            name: customName.trim(),
+            icon: customIcon,
+            dosage: dosageNum,
+            unit: customUnit.trim() || 'mg',
+            reminderTime: customReminderTimeNew,
+            addedAt: new Date().toISOString(),
+            isCustom: true,
+        };
+
+        const exists = supplements.find(s => s.id === id);
+        let updated;
+        if (exists) {
+            updated = supplements.map(s => s.id === id ? newSupplement : s);
+            await cancelSupplementReminder(id);
+        } else {
+            updated = [...supplements, newSupplement];
+        }
+        await scheduleSupplementReminder(id, newSupplement.name, customReminderTimeNew);
+        await saveSupplements(updated);
+        setSupplements(updated);
+        setCustomModalVisible(false);
+        successFeedback();
     };
 
     const formatTimeInput = (text) => {
@@ -240,6 +313,10 @@ export default function SupplementsScreen() {
                                 key={supplement.id}
                                 variant="active"
                                 onPress={() => {
+                                    if (supplement.isCustom) {
+                                        openCustomModal(supplement);
+                                        return;
+                                    }
                                     const catalogItem = SUPPLEMENT_CATALOG.find(c => c.id === supplement.id);
                                     if (catalogItem) openAddModal(catalogItem);
                                 }}
@@ -306,6 +383,18 @@ export default function SupplementsScreen() {
                             </GlassCard>
                         );
                     })}
+
+                    {/* Create Custom Button */}
+                    <TouchableOpacity
+                        style={styles.createCustomButton}
+                        onPress={() => openCustomModal()}
+                    >
+                        <LinearGradient
+                            colors={['rgba(99,102,241,0.2)', 'rgba(79,70,229,0.1)']}
+                            style={StyleSheet.absoluteFill}
+                        />
+                        <Text style={styles.createCustomText}>＋ Criar Suplemento Personalizado</Text>
+                    </TouchableOpacity>
                 </View>
 
                 <View style={styles.bottomSpacer} />
@@ -466,6 +555,115 @@ export default function SupplementsScreen() {
                             </>
                         )}
                     </View>
+                </View>
+            </Modal>
+
+            {/* Custom Supplement Modal */}
+            <Modal
+                visible={customModalVisible}
+                animationType="slide"
+                transparent={true}
+                onRequestClose={() => setCustomModalVisible(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <ScrollView style={styles.modalContent} showsVerticalScrollIndicator={false}>
+                        <Text style={styles.customModalTitle}>
+                            {customSupplementId ? '✏️ Editar Suplemento' : '✨ Criar Suplemento'}
+                        </Text>
+
+                        {/* Name */}
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.inputLabel}>Nome</Text>
+                            <TextInput
+                                style={styles.customTextInput}
+                                value={customName}
+                                onChangeText={setCustomName}
+                                placeholder="Ex: Glutamina, Magnésio..."
+                                placeholderTextColor={colors.textMuted}
+                                maxLength={40}
+                            />
+                        </View>
+
+                        {/* Emoji Picker */}
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.inputLabel}>Ícone</Text>
+                            <View style={styles.emojiGrid}>
+                                {EMOJI_OPTIONS.map((emoji) => (
+                                    <TouchableOpacity
+                                        key={emoji}
+                                        style={[styles.emojiOption, customIcon === emoji && styles.emojiOptionActive]}
+                                        onPress={() => { selectionFeedback(); setCustomIcon(emoji); }}
+                                    >
+                                        <Text style={styles.emojiText}>{emoji}</Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                        </View>
+
+                        {/* Dosage + Unit */}
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.inputLabel}>Dosagem</Text>
+                            <View style={styles.dosageRow}>
+                                <TextInput
+                                    style={[styles.dosageInput, { flex: 1.5 }]}
+                                    value={customDosageAmount}
+                                    onChangeText={setCustomDosageAmount}
+                                    keyboardType="decimal-pad"
+                                    placeholder="0"
+                                    placeholderTextColor={colors.textMuted}
+                                />
+                                <TextInput
+                                    style={[styles.dosageInput, { flex: 1, marginLeft: 8 }]}
+                                    value={customUnit}
+                                    onChangeText={setCustomUnit}
+                                    placeholder="mg, g, ml..."
+                                    placeholderTextColor={colors.textMuted}
+                                    maxLength={10}
+                                />
+                            </View>
+                        </View>
+
+                        {/* Time */}
+                        <View style={styles.inputGroup}>
+                            <Text style={styles.inputLabel}>Horário do lembrete</Text>
+                            <View style={styles.timeButtons}>
+                                {PRESET_TIMES.map((time) => (
+                                    <TouchableOpacity
+                                        key={time}
+                                        style={[styles.timeButton, customReminderTimeNew === time && styles.timeButtonActive]}
+                                        onPress={() => { selectionFeedback(); setCustomReminderTimeNew(time); }}
+                                    >
+                                        <Text style={[styles.timeButtonText, customReminderTimeNew === time && styles.timeButtonTextActive]}>
+                                            {time}
+                                        </Text>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                        </View>
+
+                        <View style={styles.modalButtons}>
+                            <TouchableOpacity
+                                style={styles.cancelButton}
+                                onPress={() => { lightImpact(); setCustomModalVisible(false); }}
+                            >
+                                <Text style={styles.cancelButtonText}>Cancelar</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.confirmButton}
+                                onPress={handleAddCustomSupplement}
+                            >
+                                <LinearGradient
+                                    colors={['rgba(99,102,241,1)', 'rgba(79,70,229,1)']}
+                                    style={[StyleSheet.absoluteFill, { borderRadius: borderRadius.md }]}
+                                />
+                                <Text style={styles.confirmButtonText}>
+                                    {customSupplementId ? 'Atualizar' : 'Adicionar'}
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
+
+                        <View style={{ height: 20 }} />
+                    </ScrollView>
                 </View>
             </Modal>
 
@@ -868,5 +1066,56 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: 'rgba(99, 102, 241, 0.3)',
         alignItems: 'center',
+    },
+    createCustomButton: {
+        borderRadius: borderRadius.lg,
+        borderWidth: 1,
+        borderColor: 'rgba(99,102,241,0.4)',
+        borderStyle: 'dashed',
+        overflow: 'hidden',
+        marginTop: spacing.sm,
+        padding: spacing.md,
+        alignItems: 'center',
+    },
+    createCustomText: {
+        color: colors.primary,
+        fontWeight: '600',
+        fontSize: 15,
+    },
+    customModalTitle: {
+        ...typography.h2,
+        marginBottom: spacing.lg,
+    },
+    customTextInput: {
+        backgroundColor: colors.card,
+        borderRadius: borderRadius.md,
+        padding: spacing.md,
+        color: colors.text,
+        fontSize: 16,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
+        ...Platform.select({ web: { outlineStyle: 'none' } }),
+    },
+    emojiGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: spacing.sm,
+    },
+    emojiOption: {
+        width: 44,
+        height: 44,
+        borderRadius: borderRadius.md,
+        backgroundColor: colors.card,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.08)',
+    },
+    emojiOptionActive: {
+        borderColor: colors.primary,
+        backgroundColor: 'rgba(99,102,241,0.2)',
+    },
+    emojiText: {
+        fontSize: 22,
     },
 });
