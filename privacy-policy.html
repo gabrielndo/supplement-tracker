@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,7 +11,7 @@
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             line-height: 1.6;
@@ -19,69 +20,69 @@
             min-height: 100vh;
             padding: 20px;
         }
-        
+
         .container {
             max-width: 800px;
             margin: 0 auto;
             background: white;
             padding: 40px;
             border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
         }
-        
+
         .header {
             text-align: center;
             margin-bottom: 40px;
             padding-bottom: 20px;
             border-bottom: 3px solid #667eea;
         }
-        
+
         .header h1 {
             font-size: 2.5em;
             color: #667eea;
             margin-bottom: 10px;
         }
-        
+
         .app-name {
             font-size: 1.2em;
             color: #764ba2;
             font-weight: 600;
         }
-        
+
         .update-date {
             color: #666;
             font-size: 0.9em;
             margin-top: 10px;
         }
-        
+
         h2 {
             color: #667eea;
             margin-top: 30px;
             margin-bottom: 15px;
             font-size: 1.8em;
         }
-        
+
         h3 {
             color: #764ba2;
             margin-top: 20px;
             margin-bottom: 10px;
             font-size: 1.3em;
         }
-        
+
         p {
             margin-bottom: 15px;
             text-align: justify;
         }
-        
+
         ul {
             margin-left: 30px;
             margin-bottom: 20px;
         }
-        
+
         li {
             margin-bottom: 10px;
         }
-        
+
         .highlight {
             background: #f0f4ff;
             padding: 20px;
@@ -89,7 +90,7 @@
             margin: 20px 0;
             border-radius: 5px;
         }
-        
+
         .contact {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -98,28 +99,29 @@
             margin-top: 40px;
             text-align: center;
         }
-        
+
         .contact h2 {
             color: white;
             margin-top: 0;
         }
-        
+
         .contact a {
             color: #fff;
             text-decoration: underline;
         }
-        
+
         @media (max-width: 768px) {
             .container {
                 padding: 20px;
             }
-            
+
             .header h1 {
                 font-size: 2em;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <div class="header">
@@ -130,16 +132,20 @@
 
         <h2>1. Introdução</h2>
         <p>
-            Bem-vindo ao <strong>MeusSuple</strong>! Esta Política de Privacidade descreve como lidamos com suas informações pessoais quando você usa nosso aplicativo.
+            Bem-vindo ao <strong>MeusSuple</strong>! Esta Política de Privacidade descreve como lidamos com suas
+            informações pessoais quando você usa nosso aplicativo.
         </p>
-        
+
         <div class="highlight">
-            <strong>Em resumo:</strong> O MeusSuple foi projetado com privacidade em mente. NÃO coletamos, armazenamos ou compartilhamos seus dados pessoais em servidores externos. Tudo fica no seu dispositivo!
+            <strong>Em resumo:</strong> O MeusSuple foi projetado para ser seguro. Seus dados básicos de cadastro e
+            progresso agora são sincronizados de forma segura na nuvem para garantir o backup e acesso em múltiplos
+            dispositivos, mas continuamos comprometidos em não vender ou comercializar suas informações.
         </div>
 
         <h2>2. Coleta de Dados</h2>
         <p>
-            O MeusSuple <strong>NÃO coleta</strong> nenhum dado pessoal identificável. Não temos servidores, não fazemos rastreamento, e não compartilhamos suas informações com terceiros.
+            O MeusSuple coleta apenas as informações estritamente necessárias para o funcionamento do aplicativo e do
+            seu serviço de conta.
         </p>
 
         <h3>2.1 Dados que você insere no app:</h3>
@@ -150,9 +156,22 @@
             <li><strong>Histórico:</strong> dados de consumo ao longo do tempo</li>
         </ul>
 
-        <h3>2.2 Onde esses dados ficam?</h3>
+        <h3>2.2 Autenticação (Login)</h3>
         <p>
-            Todos os dados são armazenados <strong>LOCALMENTE</strong> no seu dispositivo usando a tecnologia AsyncStorage (armazenamento local do React Native). Eles <strong>NUNCA</strong> saem do seu celular.
+            Para permitir o backup e a sincronização em vários dispositivos, você pode criar uma conta usando:
+        </p>
+        <ul>
+            <li><strong>Email e Senha:</strong> Coletamos seu nome, endereço de email e criamos um identificador único
+                de usuário.</li>
+            <li><strong>Login com Google:</strong> Podemos receber seu nome, endereço de e-mail e foto de perfil pública
+                associada à sua conta Google.</li>
+        </ul>
+
+        <h3>2.3 Onde esses dados ficam?</h3>
+        <p>
+            Seus dados são armazenados localmente no seu dispositivo (para acesso offline e agilidade) e sincronizados
+            de forma segura e criptografada utilizando a infraestrutura do <strong>Google (Firebase Firestore e Firebase
+                Authentication)</strong>. Os dados são privados e vinculados unicamente à sua conta autenticada.
         </p>
 
         <h2>3. Uso dos Dados</h2>
@@ -169,7 +188,9 @@
 
         <h2>4. Compartilhamento de Dados</h2>
         <p>
-            <strong>Não compartilhamos</strong> seus dados com ninguém porque <strong>não temos acesso</strong> a eles! Como tudo fica armazenado localmente no seu dispositivo, não há dados para compartilhar.
+            <strong>Nós não vendemos, alugamos ou comercializamos seus dados pessoais.</strong> Suas informações são
+            compartilhadas apenas e exclusivamente com os provedores de infraestrutura técnica (como o Google
+            Cloud/Firebase) estritamente na medida necessária para hospedar sua conta e seus dados com segurança.
         </p>
 
         <h2>5. Permissões do Aplicativo</h2>
@@ -197,35 +218,37 @@
             <strong>Por quê:</strong> Para agendar notificações nos horários exatos que você configurou.
         </p>
 
-        <h2>6. Serviços de Terceiros</h2>
+        <h2>6. Serviços de Terceiros e Analytics</h2>
         <p>
-            O MeusSuple <strong>NÃO utiliza</strong> nenhum serviço de terceiros para:
+            O MeusSuple utiliza os seguintes serviços de infraestrutura técnica de terceiros, que possuem suas próprias
+            políticas de segurança:
         </p>
         <ul>
-            <li>Analytics (Google Analytics, Firebase Analytics, etc.)</li>
-            <li>Publicidade</li>
-            <li>Rastreamento de comportamento</li>
-            <li>Crash reporting externo</li>
+            <li><strong>Firebase Authentication:</strong> Para o gerenciamento seguro de contas e senhas.</li>
+            <li><strong>Firebase Firestore:</strong> Banco de dados em nuvem operado pelo Google para sincronizar suas
+                informações.</li>
+            <li><strong>Google Sign-In:</strong> Provedor de autenticação opcional para facilitar sua entrada no app.
+            </li>
         </ul>
+        <p>Nós NÃO utilizamos serviços de publicidade (ads) que compartilhem seus hábitos com o mercado publicitário.
+        </p>
 
         <h2>7. Segurança</h2>
         <p>
-            Como todos os dados ficam armazenados localmente no seu dispositivo, a segurança depende das proteções nativas do seu sistema operacional Android. Recomendamos:
+            Aplicamos medidas de segurança tanto locais quanto na nuvem. A comunicação entre o seu aplicativo e nossos
+            bancos de dados no Firebase é criptografada usando protocolos de segurança padrão do setor (HTTPS). O acesso
+            às suas informações na nuvem só é possível através da sua conta autenticada (senha ou Google).
         </p>
-        <ul>
-            <li>Manter seu dispositivo atualizado</li>
-            <li>Usar bloqueio de tela (PIN, senha, biometria)</li>
-            <li>Fazer backup regular do seu dispositivo</li>
-        </ul>
 
         <h2>8. Exclusão de Dados</h2>
         <p>
-            Como não armazenamos dados em servidores, você tem <strong>controle total</strong>:
+            Você tem <strong>controle total</strong> sobre seus dados e sua conta:
         </p>
         <ul>
-            <li><strong>Desinstalar o app:</strong> Remove todos os dados permanentemente</li>
-            <li><strong>Logout:</strong> Apaga seus dados locais instantaneamente</li>
-            <li><strong>Limpar dados do app:</strong> Via configurações do Android</li>
+            <li>A exclusão da sua conta (futuro recurso no app, ou via solicitação no suporte) apaga permanentemente
+                todos os seus registros de suplementos, históricos e dados pessoais do nosso banco de dados.</li>
+            <li>Realizar o "Logout" (Sair) apaga instantaneamente os dados armazenados localmente no aparelho até o
+                próximo login.</li>
         </ul>
 
         <h2>9. Direitos dos Usuários (LGPD)</h2>
@@ -233,19 +256,15 @@
             Em conformidade com a Lei Geral de Proteção de Dados (LGPD), você tem direito a:
         </p>
         <ul>
-            <li><strong>Acesso:</strong> Ver todos os seus dados (diretamente no app)</li>
-            <li><strong>Correção:</strong> Editar informações incorretas (no perfil)</li>
-            <li><strong>Exclusão:</strong> Apagar seus dados a qualquer momento (logout)</li>
-            <li><strong>Portabilidade:</strong> Exportar seus dados (recurso planejado)</li>
+            <li><strong>Acesso e Portabilidade:</strong> Ver todos os seus dados diretamente no app.</li>
+            <li><strong>Correção:</strong> Editar informações incorretas na tela de perfil ou estoques.</li>
+            <li><strong>Exclusão:</strong> Solicitar o encerramento da sua conta e deleção dos seus dados.</li>
         </ul>
-
-        <div class="highlight">
-            <strong>Importante:</strong> Como não coletamos dados, a maioria desses direitos já são garantidos por padrão - você sempre teve controle total sobre suas informações!
-        </div>
 
         <h2>10. Crianças</h2>
         <p>
-            O MeusSuple é destinado a usuários de todas as idades. Como não coletamos dados pessoais, não há restrições específicas quanto ao uso por menores de idade. Recomendamos supervisão dos pais ou responsáveis.
+            O MeusSuple é destinado a usuários de todas as idades. Como não coletamos dados pessoais, não há restrições
+            específicas quanto ao uso por menores de idade. Recomendamos supervisão dos pais ou responsáveis.
         </p>
 
         <h2>11. Alterações nesta Política</h2>
@@ -277,4 +296,5 @@
         </div>
     </div>
 </body>
+
 </html>

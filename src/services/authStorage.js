@@ -1,150 +1,136 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import * as Crypto from 'expo-crypto';
+import {
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    updateProfile,
+    onAuthStateChanged,
+    sendPasswordResetEmail,
+} from 'firebase/auth';
+import { auth } from './firebase';
 
-const AUTH_KEY = '@supplement_tracker:auth';
-const USERS_KEY = '@supplement_tracker:users';
-
-// Hash a password using SHA-256
-export const hashPassword = async (password) => {
-    return await Crypto.digestStringAsync(
-        Crypto.CryptoDigestAlgorithm.SHA256,
-        password
-    );
+/**
+ * Get current authenticated user (Firebase)
+ */
+export const getAuthUser = () => {
+    const user = auth.currentUser;
+    if (!user) return null;
+    return {
+        id: user.uid,
+        name: user.displayName || 'Usuário',
+        email: user.email,
+        photoUrl: user.photoURL,
+        authMethod: 'email',
+    };
 };
 
 /**
- * Get current authenticated user
+ * Reset Password
  */
-export const getAuthUser = async () => {
+export const resetPassword = async (email) => {
     try {
-        const data = await AsyncStorage.getItem(AUTH_KEY);
-        return data ? JSON.parse(data) : null;
+        await sendPasswordResetEmail(auth, email.trim());
+        return { success: true };
     } catch (error) {
-        console.error('Error getting auth user:', error);
-        return null;
+        let message = 'Erro ao enviar e-mail de recuperação. Tente novamente.';
+        if (error.code === 'auth/user-not-found') message = 'E-mail não encontrado.';
+        if (error.code === 'auth/invalid-email') message = 'E-mail inválido.';
+        return { success: false, error: message };
     }
 };
 
 /**
- * Save authenticated user (session)
+ * Listen to auth state changes
  */
-export const saveAuthUser = async (user) => {
-    try {
-        await AsyncStorage.setItem(AUTH_KEY, JSON.stringify({
-            ...user,
-            createdAt: user.createdAt || new Date().toISOString(),
-            lastLoginAt: new Date().toISOString(),
-        }));
-        return true;
-    } catch (error) {
-        console.error('Error saving auth user:', error);
-        return false;
-    }
+export const onAuthStateChange = (callback) => {
+    return onAuthStateChanged(auth, (user) => {
+        if (user) {
+            callback({
+                id: user.uid,
+                name: user.displayName || 'Usuário',
+                email: user.email,
+                photoUrl: user.photoURL,
+                authMethod: user.providerData[0]?.providerId === 'google.com' ? 'google' : 'email',
+            });
+        } else {
+            callback(null);
+        }
+    });
 };
 
 /**
- * Register a new user with email and password
- * Returns { success, error }
+ * Register with email and password
  */
 export const registerWithEmail = async (name, email, password) => {
     try {
-        const usersRaw = await AsyncStorage.getItem(USERS_KEY);
-        const users = usersRaw ? JSON.parse(usersRaw) : [];
-
-        const emailLower = email.trim().toLowerCase();
-        if (users.find(u => u.email === emailLower)) {
-            return { success: false, error: 'Este e-mail já está cadastrado.' };
-        }
-
-        const passwordHash = await hashPassword(password);
-        const user = {
-            id: `email_${Date.now()}`,
-            name: name.trim(),
-            email: emailLower,
-            passwordHash,
-            photoUrl: null,
-            authMethod: 'email',
-            createdAt: new Date().toISOString(),
+        const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
+        // Set display name
+        await updateProfile(userCredential.user, { displayName: name.trim() });
+        return {
+            success: true,
+            user: {
+                id: userCredential.user.uid,
+                name: name.trim(),
+                email: userCredential.user.email,
+                photoUrl: null,
+                authMethod: 'email',
+            }
         };
-
-        users.push(user);
-        await AsyncStorage.setItem(USERS_KEY, JSON.stringify(users));
-
-        // Save session (without passwordHash)
-        const { passwordHash: _, ...sessionUser } = user;
-        await saveAuthUser(sessionUser);
-
-        return { success: true, user: sessionUser };
     } catch (error) {
-        console.error('Register error:', error);
-        return { success: false, error: 'Erro ao criar conta. Tente novamente.' };
+        let message = 'Erro ao criar conta. Tente novamente.';
+        if (error.code === 'auth/email-already-in-use') message = 'Este e-mail já está cadastrado.';
+        if (error.code === 'auth/invalid-email') message = 'E-mail inválido.';
+        if (error.code === 'auth/weak-password') message = 'Senha muito fraca. Use pelo menos 6 caracteres.';
+        return { success: false, error: message };
     }
 };
 
 /**
  * Login with email and password
- * Returns { success, error }
  */
 export const loginWithEmail = async (email, password) => {
     try {
-        const usersRaw = await AsyncStorage.getItem(USERS_KEY);
-        const users = usersRaw ? JSON.parse(usersRaw) : [];
-
-        const emailLower = email.trim().toLowerCase();
-        const user = users.find(u => u.email === emailLower);
-
-        if (!user) {
-            return { success: false, error: 'E-mail não encontrado.' };
-        }
-
-        const passwordHash = await hashPassword(password);
-        if (user.passwordHash !== passwordHash) {
-            return { success: false, error: 'Senha incorreta.' };
-        }
-
-        const { passwordHash: _, ...sessionUser } = user;
-        await saveAuthUser(sessionUser);
-
-        return { success: true, user: sessionUser };
+        const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password);
+        const user = userCredential.user;
+        return {
+            success: true,
+            user: {
+                id: user.uid,
+                name: user.displayName || 'Usuário',
+                email: user.email,
+                photoUrl: user.photoURL,
+                authMethod: 'email',
+            }
+        };
     } catch (error) {
-        console.error('Login error:', error);
-        return { success: false, error: 'Erro ao fazer login. Tente novamente.' };
+        let message = 'Erro ao fazer login. Tente novamente.';
+        if (error.code === 'auth/user-not-found') message = 'E-mail não encontrado.';
+        if (error.code === 'auth/wrong-password') message = 'Senha incorreta.';
+        if (error.code === 'auth/invalid-credential') message = 'E-mail ou senha incorretos.';
+        if (error.code === 'auth/too-many-requests') message = 'Muitas tentativas. Tente mais tarde.';
+        return { success: false, error: message };
     }
 };
 
 /**
- * Update authenticated user data
- */
-export const updateAuthUser = async (updates) => {
-    try {
-        const currentUser = await getAuthUser();
-        if (!currentUser) return false;
-        const updatedUser = { ...currentUser, ...updates, updatedAt: new Date().toISOString() };
-        await AsyncStorage.setItem(AUTH_KEY, JSON.stringify(updatedUser));
-        return true;
-    } catch (error) {
-        console.error('Error updating auth user:', error);
-        return false;
-    }
-};
-
-/**
- * Logout current user
+ * Logout
  */
 export const logout = async () => {
     try {
-        await AsyncStorage.removeItem(AUTH_KEY);
+        await signOut(auth);
         return true;
     } catch (error) {
-        console.error('Error logging out:', error);
+        console.error('Logout error:', error);
         return false;
     }
 };
 
 /**
- * Check if user is authenticated
+ * Check if authenticated
  */
-export const isAuthenticated = async () => {
-    const user = await getAuthUser();
-    return user !== null;
+export const isAuthenticated = () => {
+    return auth.currentUser !== null;
 };
+
+// Legacy compatibility - kept for any code still using these
+export const saveAuthUser = async () => true;
+export const updateAuthUser = async () => true;

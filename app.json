@@ -42,7 +42,8 @@
             "enablePngCrunchInReleaseBuilds": false
           }
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "extra": {
       "eas": {

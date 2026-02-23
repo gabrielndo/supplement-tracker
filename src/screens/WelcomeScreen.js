@@ -14,8 +14,14 @@ import {
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, typography } from '../styles/theme';
-import { saveAuthUser, registerWithEmail, loginWithEmail } from '../services/authStorage';
+import { registerWithEmail, loginWithEmail, resetPassword } from '../services/authStorage';
 import { successFeedback, lightImpact } from '../services/haptics';
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
+import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
+import { auth } from '../services/firebase';
+
+WebBrowser.maybeCompleteAuthSession();
 
 // ─── Glass Card ──────────────────────────────────────────────────────────────
 const GlassCard = ({ children, style }) => (
@@ -47,6 +53,7 @@ const Input = ({ label, icon, ...props }) => (
     </View>
 );
 
+
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function WelcomeScreen({ onComplete }) {
     // mode: 'landing' | 'login' | 'signup'
@@ -57,6 +64,31 @@ export default function WelcomeScreen({ onComplete }) {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+
+    // Google Auth Request hook
+    const [request, response, promptAsync] = Google.useAuthRequest({
+        webClientId: '836407434116-760rshqee3fvi3qd9nmv532slpiivfib.apps.googleusercontent.com',
+        androidClientId: '836407434116-a66716ubltqkp33duegp9spiq662hng1.apps.googleusercontent.com',
+        iosClientId: '836407434116-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com',
+    });
+
+    React.useEffect(() => {
+        if (response?.type === 'success') {
+            const { id_token } = response.params;
+            const credential = GoogleAuthProvider.credential(id_token);
+            setLoading(true);
+            signInWithCredential(auth, credential)
+                .then(() => {
+                    successFeedback();
+                    onComplete();
+                })
+                .catch((error) => {
+                    console.error('Google Sign-In Error:', error);
+                    Alert.alert('Erro', 'Não foi possível entrar com o Google.');
+                })
+                .finally(() => setLoading(false));
+        }
+    }, [response]);
 
     const validateEmail = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim());
 
@@ -112,14 +144,37 @@ export default function WelcomeScreen({ onComplete }) {
         }
     };
 
-    // ── Google (placeholder) ──────────────────────────────────────────────────
+    // ── Forgot Password ───────────────────────────────────────────────────────
+    const handleForgotPassword = async () => {
+        lightImpact();
+        if (!email.trim() || !validateEmail(email)) {
+            Alert.alert(
+                'Digite seu e-mail',
+                'Por favor, digite seu e-mail no campo acima para que possamos enviar o link de recuperação.'
+            );
+            return;
+        }
+
+        setLoading(true);
+        const result = await resetPassword(email);
+        setLoading(false);
+
+        if (result.success) {
+            successFeedback();
+            Alert.alert(
+                'E-mail enviado! 📬',
+                'Verifique sua caixa de entrada (e pasta de spam) para as instruções de recuperação de senha.'
+            );
+        } else {
+            errorFeedback();
+            Alert.alert('Erro', result.error);
+        }
+    };
+
+    // ── Google ────────────────────────────────────────────────────────────────
     const handleGoogle = () => {
         lightImpact();
-        Alert.alert(
-            'Em breve',
-            'O login com Google estará disponível em breve. Configure suas credenciais no Google Cloud Console.',
-            [{ text: 'OK' }]
-        );
+        promptAsync();
     };
 
     const resetForm = (newMode) => {
@@ -286,6 +341,17 @@ export default function WelcomeScreen({ onComplete }) {
                             {showPassword ? '🙈 Ocultar senha' : '👁️ Mostrar senha'}
                         </Text>
                     </TouchableOpacity>
+
+                    {isLogin && (
+                        <TouchableOpacity
+                            style={styles.forgotPasswordRow}
+                            onPress={handleForgotPassword}
+                        >
+                            <Text style={styles.forgotPasswordText}>
+                                Esqueceu a senha?
+                            </Text>
+                        </TouchableOpacity>
+                    )}
                 </GlassCard>
 
                 {/* Submit */}
@@ -354,6 +420,8 @@ const styles = StyleSheet.create({
         width: 110,
         height: 110,
         marginBottom: spacing.md,
+        borderRadius: 28,
+        overflow: 'hidden',
     },
     appName: {
         fontSize: 36,
@@ -507,11 +575,20 @@ const styles = StyleSheet.create({
     },
     showPasswordRow: {
         alignItems: 'flex-end',
-        marginTop: spacing.xs,
+        marginTop: spacing.sm,
     },
     showPasswordText: {
         color: colors.textSecondary,
         fontSize: 13,
+    },
+    forgotPasswordRow: {
+        alignItems: 'center',
+        marginTop: spacing.md,
+    },
+    forgotPasswordText: {
+        color: colors.primary,
+        fontSize: 14,
+        fontWeight: '600',
     },
     submitButton: {
         borderRadius: borderRadius.lg,

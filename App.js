@@ -9,8 +9,9 @@ import { View, ActivityIndicator } from 'react-native';
 import { lightImpact } from './src/services/haptics';
 import * as Notifications from 'expo-notifications';
 import { configureNotifications, requestPermissions, handleNotificationAction, WATER_CATEGORY } from './src/services/notifications';
-import { getAuthUser, isAuthenticated } from './src/services/authStorage';
+import { onAuthStateChange } from './src/services/authStorage';
 import { getProfile } from './src/services/storage';
+
 
 import HomeScreen from './src/screens/HomeScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
@@ -193,20 +194,16 @@ export default function App() {
   });
 
   useEffect(() => {
-    checkAuthStatus();
-  }, []);
-
-  const checkAuthStatus = async () => {
-    try {
-      const isAuth = await isAuthenticated();
-      if (isAuth) {
-        const user = await getAuthUser();
-        const profile = await getProfile();
+    // Firebase auth state listener - auto-updates on login/logout
+    const unsubscribe = onAuthStateChange(async (user) => {
+      if (user) {
+        const profile = await getProfile(user.id);
         setAuthState({
           loading: false,
           isAuth: true,
           hasProfile: !!profile,
-          userName: user?.name || 'Usuário',
+          userName: user.name || 'Usuário',
+          userId: user.id,
         });
       } else {
         setAuthState({
@@ -214,21 +211,15 @@ export default function App() {
           isAuth: false,
           hasProfile: false,
           userName: '',
+          userId: null,
         });
       }
-    } catch (error) {
-      console.error('Error checking auth status:', error);
-      setAuthState({
-        loading: false,
-        isAuth: false,
-        hasProfile: false,
-        userName: '',
-      });
-    }
-  };
+    });
+    return () => unsubscribe();
+  }, []);
 
   const handleWelcomeComplete = () => {
-    checkAuthStatus();
+    // Firebase onAuthStateChange listener handles this automatically
   };
 
   const handleOnboardingComplete = () => {

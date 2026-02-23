@@ -100,6 +100,8 @@ export default function SupplementsScreen() {
     const [customDosageAmount, setCustomDosageAmount] = useState('');
     const [customSupplementId, setCustomSupplementId] = useState(null);
     const [customReminderTimeNew, setCustomReminderTimeNew] = useState('08:00');
+    const [showCustomTimeInputNew, setShowCustomTimeInputNew] = useState(false);
+    const [customTimePickerValueNew, setCustomTimePickerValueNew] = useState('');
 
     useFocusEffect(
         useCallback(() => {
@@ -149,6 +151,8 @@ export default function SupplementsScreen() {
             setCustomDosageAmount('');
             setCustomUnit('mg');
             setCustomReminderTimeNew('08:00');
+            setShowCustomTimeInputNew(false);
+            setCustomTimePickerValueNew('');
         }
         setCustomModalVisible(true);
     };
@@ -631,17 +635,59 @@ export default function SupplementsScreen() {
                                     <TouchableOpacity
                                         key={time}
                                         style={[styles.timeButton, customReminderTimeNew === time && styles.timeButtonActive]}
-                                        onPress={() => { selectionFeedback(); setCustomReminderTimeNew(time); }}
+                                        onPress={() => {
+                                            selectionFeedback();
+                                            setCustomReminderTimeNew(time);
+                                            setShowCustomTimeInputNew(false);
+                                        }}
                                     >
                                         <Text style={[styles.timeButtonText, customReminderTimeNew === time && styles.timeButtonTextActive]}>
                                             {time}
                                         </Text>
                                     </TouchableOpacity>
                                 ))}
+                                <TouchableOpacity
+                                    style={[styles.timeButton, styles.customTimeButton, (showCustomTimeInputNew || (customReminderTimeNew && !PRESET_TIMES.includes(customReminderTimeNew))) && styles.timeButtonActive]}
+                                    onPress={() => {
+                                        lightImpact();
+                                        setCustomTimePickerValueNew(customReminderTimeNew);
+                                        setShowCustomTimeInputNew(true);
+                                    }}
+                                >
+                                    <Text style={[styles.timeButtonText, (showCustomTimeInputNew || (customReminderTimeNew && !PRESET_TIMES.includes(customReminderTimeNew))) && styles.timeButtonTextActive]}>
+                                        {(customReminderTimeNew && !PRESET_TIMES.includes(customReminderTimeNew)) ? `${customReminderTimeNew} ✏️` : '✏️'}
+                                    </Text>
+                                </TouchableOpacity>
                             </View>
+
+                            {showCustomTimeInputNew && (
+                                <View style={styles.customTimePickerContainer}>
+                                    <DateTimePicker
+                                        value={new Date(2000, 0, 1, parseInt(customTimePickerValueNew.split(':')[0] || '8'), parseInt(customTimePickerValueNew.split(':')[1] || '0'))}
+                                        mode="time"
+                                        is24Hour={true}
+                                        display="spinner"
+                                        onChange={(event, selectedDate) => {
+                                            if (selectedDate) {
+                                                const hours = selectedDate.getHours().toString().padStart(2, '0');
+                                                const minutes = selectedDate.getMinutes().toString().padStart(2, '0');
+                                                const timeString = `${hours}:${minutes}`;
+                                                selectionFeedback();
+                                                setCustomReminderTimeNew(timeString);
+                                                setCustomTimePickerValueNew(timeString);
+                                                setShowCustomTimeInputNew(false);
+                                            }
+                                        }}
+                                        textColor={colors.text}
+                                        accentColor="#ffffff"
+                                        themeVariant="dark"
+                                        style={{ backgroundColor: 'transparent', height: 120 }}
+                                    />
+                                </View>
+                            )}
                         </View>
 
-                        <View style={styles.modalButtons}>
+                        <View style={[styles.modalButtons, { marginBottom: spacing.xl }]}>
                             <TouchableOpacity
                                 style={styles.cancelButton}
                                 onPress={() => { lightImpact(); setCustomModalVisible(false); }}
@@ -662,7 +708,7 @@ export default function SupplementsScreen() {
                             </TouchableOpacity>
                         </View>
 
-                        <View style={{ height: 20 }} />
+                        <View style={{ height: 60 }} />
                     </ScrollView>
                 </View>
             </Modal>
