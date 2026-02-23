@@ -16,12 +16,13 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, typography } from '../styles/theme';
 import { registerWithEmail, loginWithEmail, resetPassword } from '../services/authStorage';
 import { successFeedback, lightImpact } from '../services/haptics';
-import * as WebBrowser from 'expo-web-browser';
-import * as Google from 'expo-auth-session/providers/google';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import { GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
 import { auth } from '../services/firebase';
 
-WebBrowser.maybeCompleteAuthSession();
+GoogleSignin.configure({
+    webClientId: '836407434116-760rshqee3fvi3qd9nmv532slpiivfib.apps.googleusercontent.com',
+});
 
 // ─── Glass Card ──────────────────────────────────────────────────────────────
 const GlassCard = ({ children, style }) => (
@@ -65,30 +66,7 @@ export default function WelcomeScreen({ onComplete }) {
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-    // Google Auth Request hook
-    const [request, response, promptAsync] = Google.useAuthRequest({
-        webClientId: '836407434116-760rshqee3fvi3qd9nmv532slpiivfib.apps.googleusercontent.com',
-        androidClientId: '836407434116-a66716ubltqkp33duegp9spiq662hng1.apps.googleusercontent.com',
-        iosClientId: '836407434116-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com',
-    });
 
-    React.useEffect(() => {
-        if (response?.type === 'success') {
-            const { id_token } = response.params;
-            const credential = GoogleAuthProvider.credential(id_token);
-            setLoading(true);
-            signInWithCredential(auth, credential)
-                .then(() => {
-                    successFeedback();
-                    onComplete();
-                })
-                .catch((error) => {
-                    console.error('Google Sign-In Error:', error);
-                    Alert.alert('Erro', 'Não foi possível entrar com o Google.');
-                })
-                .finally(() => setLoading(false));
-        }
-    }, [response]);
 
     const validateEmail = (e) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e.trim());
 
@@ -172,9 +150,31 @@ export default function WelcomeScreen({ onComplete }) {
     };
 
     // ── Google ────────────────────────────────────────────────────────────────
-    const handleGoogle = () => {
+    const handleGoogle = async () => {
         lightImpact();
-        promptAsync();
+        try {
+            setLoading(true);
+            await GoogleSignin.hasPlayServices();
+            const userInfo = await GoogleSignin.signIn();
+            // Pega o idToken independentemente da versão da biblioteca (v13+ retornaria em data.idToken)
+            const idToken = userInfo?.data?.idToken || userInfo?.idToken;
+
+            if (idToken) {
+                const credential = GoogleAuthProvider.credential(idToken);
+                await signInWithCredential(auth, credential);
+                successFeedback();
+                onComplete();
+            } else {
+                throw new Error('Nenhum token ID recebido do Google');
+            }
+        } catch (error) {
+            console.error('Google Sign-In Error:', error);
+            if (error.code !== 12501 && error.code !== 'SIGN_IN_CANCELLED') {
+                Alert.alert('Erro', 'Não foi possível entrar com o Google.');
+            }
+        } finally {
+            setLoading(false);
+        }
     };
 
     const resetForm = (newMode) => {
