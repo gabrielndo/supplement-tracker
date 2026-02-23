@@ -3,6 +3,7 @@
     "name": "MeusSuple - Rastreador e Lembrete",
     "slug": "supplement-tracker",
     "version": "1.0.0",
+    "scheme": "com.supplementtracker.app",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
