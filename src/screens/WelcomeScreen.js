@@ -211,8 +211,8 @@ export default function WelcomeScreen({ onComplete }) {
                         {/* Google */}
                         <TouchableOpacity style={styles.googleButton} onPress={handleGoogle}>
                             <GlassCard style={styles.googleCard}>
-                                <Text style={styles.googleIcon}>G</Text>
-                                <Text style={styles.googleText}>Continuar com Google</Text>
+                                <Image source={require('../../assets/google-logo.png')} style={styles.googleLogo} />
+                                <Text style={styles.googleText}>Entrar com Google</Text>
                             </GlassCard>
                         </TouchableOpacity>
 
@@ -449,11 +449,9 @@ const styles = StyleSheet.create({
         padding: spacing.md,
         gap: spacing.sm,
     },
-    googleIcon: {
-        fontSize: 20,
-        fontWeight: '900',
-        color: '#fff',
-        fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif',
+    googleLogo: {
+        width: 22,
+        height: 22,
     },
     googleText: {
         color: colors.text,
