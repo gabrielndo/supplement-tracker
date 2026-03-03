@@ -107,7 +107,7 @@ export const loginWithEmail = async (email, password) => {
         if (error.code === 'auth/wrong-password') message = 'Senha incorreta.';
         if (error.code === 'auth/invalid-credential') message = 'E-mail ou senha incorretos.';
         if (error.code === 'auth/too-many-requests') message = 'Muitas tentativas. Tente mais tarde.';
-        return { success: false, error: message };
+        return { success: false, error: message, code: error.code };
     }
 };
 

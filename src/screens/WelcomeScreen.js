@@ -88,7 +88,7 @@ export default function WelcomeScreen({ onComplete }) {
             successFeedback();
             onComplete();
         } else {
-            Alert.alert('Erro ao entrar', result.error);
+            Alert.alert('Erro ao entrar', result.error + (result.code ? `\n(${result.code})` : ''));
         }
     };
 
@@ -165,12 +165,12 @@ export default function WelcomeScreen({ onComplete }) {
                 successFeedback();
                 onComplete();
             } else {
-                throw new Error('Nenhum token ID recebido do Google');
+                Alert.alert('Erro Google', 'Token não recebido. Dados: ' + JSON.stringify(Object.keys(userInfo || {})));
             }
         } catch (error) {
             console.error('Google Sign-In Error:', error);
             if (error.code !== 12501 && error.code !== 'SIGN_IN_CANCELLED') {
-                Alert.alert('Erro', 'Não foi possível entrar com o Google.');
+                Alert.alert('Erro Google', `Code: ${error.code}\nMsg: ${error.message}`);
             }
         } finally {
             setLoading(false);
