@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "836407434116",
+    "project_id": "meussuple",
+    "storage_bucket": "meussuple.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:836407434116:android:607e543f88659b1bc2dbd1",
+        "android_client_info": {
+          "package_name": "com.supplementtracker.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDGPA4VC7idw2u5Iu5oQH14JCjxRLPwPno"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
