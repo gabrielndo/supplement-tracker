@@ -81,14 +81,19 @@ export default function WelcomeScreen({ onComplete }) {
             Alert.alert('Senha curta', 'A senha deve ter pelo menos 6 caracteres.');
             return;
         }
-        setLoading(true);
-        const result = await loginWithEmail(email, password);
-        setLoading(false);
-        if (result.success) {
-            successFeedback();
-            onComplete();
-        } else {
-            Alert.alert('Erro ao entrar', result.error + (result.code ? `\n(${result.code})` : ''));
+        try {
+            setLoading(true);
+            const result = await loginWithEmail(email, password);
+            setLoading(false);
+            if (result.success) {
+                successFeedback();
+                onComplete();
+            } else {
+                Alert.alert('Erro ao entrar', `${result.error}\n\nCódigo: ${result.code || 'sem código'}`);
+            }
+        } catch (err) {
+            setLoading(false);
+            Alert.alert('ERRO FATAL Login', `${err.message}\n\n${err.code || ''}`);
         }
     };
 
@@ -111,14 +116,19 @@ export default function WelcomeScreen({ onComplete }) {
             Alert.alert('Senhas diferentes', 'As senhas não coincidem.');
             return;
         }
-        setLoading(true);
-        const result = await registerWithEmail(name, email, password);
-        setLoading(false);
-        if (result.success) {
-            successFeedback();
-            onComplete();
-        } else {
-            Alert.alert('Erro ao criar conta', result.error);
+        try {
+            setLoading(true);
+            const result = await registerWithEmail(name, email, password);
+            setLoading(false);
+            if (result.success) {
+                successFeedback();
+                onComplete();
+            } else {
+                Alert.alert('Erro ao criar conta', `${result.error}\n\nCódigo: ${result.code || 'sem código'}`);
+            }
+        } catch (err) {
+            setLoading(false);
+            Alert.alert('ERRO FATAL Signup', `${err.message}\n\n${err.code || ''}`);
         }
     };
 
