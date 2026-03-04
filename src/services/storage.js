@@ -2,26 +2,22 @@
  * storage.js - Firestore + AsyncStorage hybrid
  * 
  * Strategy:
+ * - Cache-first: reads from AsyncStorage immediately, syncs with Firestore in background
+ * - Parallel Firestore calls via Promise.all (no more serial loops)
  * - Primary: Firestore (cloud, per-user)
  * - Fallback: AsyncStorage (offline / unauthenticated)
  * 
  * All Firestore data is stored under users/{uid}/...
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, getDocs, collection } from 'firebase/firestore';
 import { db, auth } from './firebase';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const getUserId = () => auth.currentUser?.uid || null;
 
-const userDoc = (path) => {
-    const uid = getUserId();
-    if (!uid) return null;
-    return doc(db, 'users', uid, ...path.split('/'));
-};
-
-// Local cache keys (fallback when offline / not logged in)
+// Local cache keys
 const KEYS = {
     PROFILE: '@supplement_tracker_profile',
     SUPPLEMENTS: '@supplement_tracker_supplements',
@@ -36,16 +32,16 @@ const KEYS = {
 
 export const saveProfile = async (profile, uid = null) => {
     try {
-        // Save to AsyncStorage (local cache)
+        // Save to local cache immediately
         await AsyncStorage.setItem(KEYS.PROFILE, JSON.stringify(profile));
 
-        // Save to Firestore if authenticated
+        // Persist to Firestore in background (don't await to block UI)
         const userId = uid || getUserId();
         if (userId) {
-            await setDoc(doc(db, 'users', userId, 'data', 'profile'), {
+            setDoc(doc(db, 'users', userId, 'data', 'profile'), {
                 ...profile,
                 updatedAt: new Date().toISOString(),
-            });
+            }).catch(e => console.warn('Firestore profile save failed:', e));
         }
         return true;
     } catch (error) {
@@ -56,24 +52,24 @@ export const saveProfile = async (profile, uid = null) => {
 
 export const getProfile = async (uid = null) => {
     try {
-        // Try Firestore first if authenticated
+        // 1. Return local cache instantly
+        const cached = await AsyncStorage.getItem(KEYS.PROFILE);
+        if (cached) return JSON.parse(cached);
+
+        // 2. Cache miss → fetch from Firestore
         const userId = uid || getUserId();
         if (userId) {
             const ref = doc(db, 'users', userId, 'data', 'profile');
             const snap = await getDoc(ref);
             if (snap.exists()) {
                 const data = snap.data();
-                // Update local cache
                 await AsyncStorage.setItem(KEYS.PROFILE, JSON.stringify(data));
                 return data;
             }
         }
-        // Fallback to local cache
-        const data = await AsyncStorage.getItem(KEYS.PROFILE);
-        return data ? JSON.parse(data) : null;
+        return null;
     } catch (error) {
         console.error('Error getting profile:', error);
-        // Fallback to local
         const data = await AsyncStorage.getItem(KEYS.PROFILE);
         return data ? JSON.parse(data) : null;
     }
@@ -83,14 +79,16 @@ export const getProfile = async (uid = null) => {
 
 export const saveSupplements = async (supplements) => {
     try {
+        // Save locally immediately
         await AsyncStorage.setItem(KEYS.SUPPLEMENTS, JSON.stringify(supplements));
 
+        // Persist to Firestore in background
         const userId = getUserId();
         if (userId) {
-            await setDoc(doc(db, 'users', userId, 'data', 'supplements'), {
+            setDoc(doc(db, 'users', userId, 'data', 'supplements'), {
                 list: supplements,
                 updatedAt: new Date().toISOString(),
-            });
+            }).catch(e => console.warn('Firestore supplements save failed:', e));
         }
         return true;
     } catch (error) {
@@ -101,6 +99,11 @@ export const saveSupplements = async (supplements) => {
 
 export const getSupplements = async () => {
     try {
+        // 1. Return local cache instantly
+        const cached = await AsyncStorage.getItem(KEYS.SUPPLEMENTS);
+        if (cached !== null) return JSON.parse(cached);
+
+        // 2. Cache miss → fetch from Firestore
         const userId = getUserId();
         if (userId) {
             const ref = doc(db, 'users', userId, 'data', 'supplements');
@@ -111,8 +114,7 @@ export const getSupplements = async () => {
                 return data;
             }
         }
-        const data = await AsyncStorage.getItem(KEYS.SUPPLEMENTS);
-        return data ? JSON.parse(data) : [];
+        return [];
     } catch (error) {
         console.error('Error getting supplements:', error);
         const data = await AsyncStorage.getItem(KEYS.SUPPLEMENTS);
@@ -124,15 +126,25 @@ export const getSupplements = async () => {
 
 export const getWaterLog = async (date) => {
     try {
+        // 1. Check local cache first
+        const cached = await AsyncStorage.getItem(KEYS.WATER_LOG);
+        const localLogs = cached ? JSON.parse(cached) : {};
+        if (localLogs[date]) return localLogs[date];
+
+        // 2. Cache miss → fetch from Firestore
         const userId = getUserId();
         if (userId) {
             const ref = doc(db, 'users', userId, 'waterLog', date);
             const snap = await getDoc(ref);
-            if (snap.exists()) return snap.data();
+            if (snap.exists()) {
+                const data = snap.data();
+                // Update local cache
+                localLogs[date] = data;
+                await AsyncStorage.setItem(KEYS.WATER_LOG, JSON.stringify(localLogs));
+                return data;
+            }
         }
-        const data = await AsyncStorage.getItem(KEYS.WATER_LOG);
-        const logs = data ? JSON.parse(data) : {};
-        return logs[date] || { amount: 0, entries: [] };
+        return { amount: 0, entries: [] };
     } catch (error) {
         console.error('Error getting water log:', error);
         const data = await AsyncStorage.getItem(KEYS.WATER_LOG);
@@ -149,16 +161,17 @@ export const addWaterEntry = async (date, amount) => {
             entries: [...(current.entries || []), { amount, time: new Date().toISOString() }],
         };
 
-        // Update local
+        // Update local immediately
         const data = await AsyncStorage.getItem(KEYS.WATER_LOG);
         const logs = data ? JSON.parse(data) : {};
         logs[date] = updated;
         await AsyncStorage.setItem(KEYS.WATER_LOG, JSON.stringify(logs));
 
-        // Update Firestore
+        // Persist to Firestore in background
         const userId = getUserId();
         if (userId) {
-            await setDoc(doc(db, 'users', userId, 'waterLog', date), updated);
+            setDoc(doc(db, 'users', userId, 'waterLog', date), updated)
+                .catch(e => console.warn('Firestore water save failed:', e));
         }
         return updated;
     } catch (error) {
@@ -183,9 +196,11 @@ export const removeWaterEntry = async (date, entryIndex) => {
         logs[date] = updated;
         await AsyncStorage.setItem(KEYS.WATER_LOG, JSON.stringify(logs));
 
+        // Persist to Firestore in background
         const userId = getUserId();
         if (userId) {
-            await setDoc(doc(db, 'users', userId, 'waterLog', date), updated);
+            setDoc(doc(db, 'users', userId, 'waterLog', date), updated)
+                .catch(e => console.warn('Firestore water remove failed:', e));
         }
         return updated;
     } catch (error) {
@@ -196,15 +211,41 @@ export const removeWaterEntry = async (date, entryIndex) => {
 
 export const getWaterHistory = async (days = 7) => {
     try {
-        const history = [];
-        for (let i = 0; i < days; i++) {
+        // Read all local cache at once (single AsyncStorage call)
+        const cached = await AsyncStorage.getItem(KEYS.WATER_LOG);
+        const localLogs = cached ? JSON.parse(cached) : {};
+
+        // Build date list
+        const dates = Array.from({ length: days }, (_, i) => {
             const date = new Date();
             date.setDate(date.getDate() - i);
-            const dateStr = date.toISOString().split('T')[0];
-            const log = await getWaterLog(dateStr);
-            history.unshift({ date: dateStr, amount: log.amount || 0 });
+            return date.toISOString().split('T')[0];
+        });
+
+        // Find which dates are missing in local cache
+        const missingDates = dates.filter(d => !localLogs[d]);
+
+        // Fetch all missing dates FROM FIRESTORE IN PARALLEL (not serial)
+        if (missingDates.length > 0) {
+            const userId = getUserId();
+            if (userId) {
+                const fetches = missingDates.map(date =>
+                    getDoc(doc(db, 'users', userId, 'waterLog', date))
+                        .then(snap => ({ date, data: snap.exists() ? snap.data() : null }))
+                        .catch(() => ({ date, data: null }))
+                );
+                const results = await Promise.all(fetches);
+                for (const { date, data } of results) {
+                    localLogs[date] = data || { amount: 0, entries: [] };
+                }
+                // Update local cache once with all fetched data
+                await AsyncStorage.setItem(KEYS.WATER_LOG, JSON.stringify(localLogs));
+            }
         }
-        return history;
+
+        return dates
+            .map(date => ({ date, amount: localLogs[date]?.amount || 0 }))
+            .reverse();
     } catch (error) {
         console.error('Error getting water history:', error);
         return [];
@@ -241,12 +282,13 @@ export const logConsumption = async (supplementId, date) => {
         if (!logs[date].includes(supplementId)) logs[date].push(supplementId);
         await AsyncStorage.setItem(KEYS.CONSUMPTION_LOG, JSON.stringify(logs));
 
+        // Persist to Firestore in background
         const userId = getUserId();
         if (userId) {
-            await setDoc(doc(db, 'users', userId, 'consumption', date), {
+            setDoc(doc(db, 'users', userId, 'consumption', date), {
                 taken: logs[date],
                 updatedAt: new Date().toISOString(),
-            });
+            }).catch(e => console.warn('Firestore consumption save failed:', e));
         }
         return true;
     } catch (error) {
@@ -265,12 +307,13 @@ export const removeConsumption = async (supplementId, date) => {
             logs[date].splice(index, 1);
             await AsyncStorage.setItem(KEYS.CONSUMPTION_LOG, JSON.stringify(logs));
 
+            // Persist to Firestore in background
             const userId = getUserId();
             if (userId) {
-                await setDoc(doc(db, 'users', userId, 'consumption', date), {
+                setDoc(doc(db, 'users', userId, 'consumption', date), {
                     taken: logs[date],
                     updatedAt: new Date().toISOString(),
-                });
+                }).catch(e => console.warn('Firestore consumption remove failed:', e));
             }
             return true;
         }
@@ -283,15 +326,24 @@ export const removeConsumption = async (supplementId, date) => {
 
 export const getConsumptionLog = async (date) => {
     try {
+        // 1. Check local cache first
+        const cached = await AsyncStorage.getItem(KEYS.CONSUMPTION_LOG);
+        const localLogs = cached ? JSON.parse(cached) : {};
+        if (localLogs[date] !== undefined) return localLogs[date];
+
+        // 2. Cache miss → Firestore
         const userId = getUserId();
         if (userId) {
             const ref = doc(db, 'users', userId, 'consumption', date);
             const snap = await getDoc(ref);
-            if (snap.exists()) return snap.data().taken || [];
+            if (snap.exists()) {
+                const taken = snap.data().taken || [];
+                localLogs[date] = taken;
+                await AsyncStorage.setItem(KEYS.CONSUMPTION_LOG, JSON.stringify(localLogs));
+                return taken;
+            }
         }
-        const data = await AsyncStorage.getItem(KEYS.CONSUMPTION_LOG);
-        const logs = data ? JSON.parse(data) : {};
-        return logs[date] || [];
+        return [];
     } catch (error) {
         const data = await AsyncStorage.getItem(KEYS.CONSUMPTION_LOG);
         const logs = data ? JSON.parse(data) : {};
@@ -301,9 +353,13 @@ export const getConsumptionLog = async (date) => {
 
 export const getStreak = async () => {
     try {
-        const data = await AsyncStorage.getItem(KEYS.CONSUMPTION_LOG);
-        const logs = data ? JSON.parse(data) : {};
-        const supplements = await getSupplements();
+        // Use local cache only — supplements and consumption are always kept in sync locally
+        const [supplementsRaw, consumptionRaw] = await Promise.all([
+            AsyncStorage.getItem(KEYS.SUPPLEMENTS),
+            AsyncStorage.getItem(KEYS.CONSUMPTION_LOG),
+        ]);
+        const supplements = supplementsRaw ? JSON.parse(supplementsRaw) : [];
+        const logs = consumptionRaw ? JSON.parse(consumptionRaw) : {};
         if (supplements.length === 0) return 0;
 
         let streak = 0;
@@ -338,9 +394,14 @@ export const getStreak = async () => {
 
 export const getConsumptionHistory = async (days = 7) => {
     try {
-        const data = await AsyncStorage.getItem(KEYS.CONSUMPTION_LOG);
-        const logs = data ? JSON.parse(data) : {};
-        const supplements = await getSupplements();
+        // Read both caches in parallel — no Firestore needed
+        const [supplementsRaw, consumptionRaw] = await Promise.all([
+            AsyncStorage.getItem(KEYS.SUPPLEMENTS),
+            AsyncStorage.getItem(KEYS.CONSUMPTION_LOG),
+        ]);
+        const supplements = supplementsRaw ? JSON.parse(supplementsRaw) : [];
+        const logs = consumptionRaw ? JSON.parse(consumptionRaw) : {};
+
         const history = [];
         for (let i = 0; i < days; i++) {
             const date = new Date();
@@ -406,3 +467,7 @@ export const saveStoredAchievements = async (achievementIds) => {
         return false;
     }
 };
+
+// Legacy compatibility
+export const saveAuthUser = async () => true;
+export const updateAuthUser = async () => true;
