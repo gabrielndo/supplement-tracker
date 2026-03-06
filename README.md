@@ -1,13 +1,13 @@
-# Supplement Tracker 💊💧
+# Supplement Tracker (MeusSuple)
 
-Um app simples e direto ao ponto pra ajudar a galera a não esquecer de tomar os suplementos e beber água direito. Feito em React Native usando Expo.
+Um app simples e prático, para ajudar a mapear e criar lembretes de suplementos e beber água. Feito em React Native usando Expo.
 
-## O que tem de bom aqui
+## Interface
 
-*   **Login rápido:** Dá pra entrar com Google ou email/senha de boa (valeu, Firebase).
-*   **Gestão de Suplementos:** Cadastra o que você toma, os horários e já era. O app te avisa na hora certa com notificações locais.
+*   **Login rápido:** Auth com Google ou email/senha com integração na Firebase.
+*   **Gestão de Suplementos:** Cadastra o que você toma, os horários, a IA irá sugerir de acordo com seu Perfil. O app te avisa na hora certa com notificações locais e monitorar o acompanhamento do progresso de streak, similar ao duolingo.
 *   **Água interativa:** Tem um copinho d'água na tela que enche de verdade conforme você bebe (usa até o giroscópio do celular pra dar um efeito legal). 
-*   **Offline First:** Ninguém merece app que congela quando a internet tá ruim. Ele salva tudo no dispositivo primeiro (`AsyncStorage`) e sobe pro Firestore em background. Assim a interface carrega instantaneamente.
+*   **Offline First:** Utilização em cache local (`AsyncStorage`) e sobe pro Firestore em background. Assim a interface carrega instantaneamente.
 *   **Dashboard e Streaks:** Dá pra ver como tá a consistência nos últimos dias, acompanhar as ofensivas e bater metas.
 *   **Visual de responsa:** Interface toda baseada no estilo "Liquid Glass" (vidro fosco, gradientes e feedback tátil quando clica nas coisas).
 
@@ -52,4 +52,4 @@ eas build -p android --profile production
 ```
 
 ## Licença
-Pode usar, forkar, copiar código, fica a vontade. O projeto é aberto.
+Projeto de estudo.
