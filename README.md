@@ -1,61 +1,49 @@
-# SupplementTracker 💊💧
+# Supplement Tracker 💊💧
 
-SupplementTracker é um aplicativo móvel moderno e elegante desenvolvido em React Native com a plataforma Expo. Focado em ajudar usuários a manterem a consistência nas suas rotinas de saúde, o aplicativo gerencia inteligentemente o uso de suplementos e a hidratação diária, tudo embalado em uma belíssima e fluida interface "Liquid Glass".
+Um app simples e direto ao ponto pra ajudar a galera a não esquecer de tomar os suplementos e beber água direito. Feito em React Native usando Expo.
 
-## 🌟 Principais Funcionalidades
+## O que tem de bom aqui
 
-- **Autenticação Segura:** Login rápido e seguro utilizando Conta Google ou E-mail/Senha (mantido pelo Firebase Auth).
-- **Rastreamento de Suplementos:** Adicione facilmente, edite e acompanhe seus suplementos diários.
-- **Notificações e Lembretes:** Nunca mais esqueça de tomar seus suplementos! Alarmes customizáveis e locais avisam a hora correta.
-- **Monitor de Hidratação Dinâmico:** Uma experiência visual interativa onde um "copo de água de vidro" vai se enchendo interativamente conforme você registra seu consumo (com detecção física de giroscópio!).
-- **Modo Offline-First:** O aplicativo é projetado para carregar instantaneamente usando cache local (`AsyncStorage`) enquanto sincroniza as últimas informações em segundo plano com o `Firestore`.
-- **Estatísticas e Ofensivas (Streaks):** Acompanhe as suas sequências de uso, observe seus hábitos a longo prazo em gráficos detalhados e desbloqueie **Conquistas/Medalhas** baseadas na sua dedicação!
-- **Perfil Inteligente:** Recomendações de metas de água e objetivos calculados a partir de suas medidas (peso e altura).
-- **UI "Liquid Glass":** Utilização profunda do efeito glassmorphism (vidro fosco translúcido), gradientes dinâmicos, feedback háptico, e micro-animações.
+*   **Login rápido:** Dá pra entrar com Google ou email/senha de boa (valeu, Firebase).
+*   **Gestão de Suplementos:** Cadastra o que você toma, os horários e já era. O app te avisa na hora certa com notificações locais.
+*   **Água interativa:** Tem um copinho d'água na tela que enche de verdade conforme você bebe (usa até o giroscópio do celular pra dar um efeito legal). 
+*   **Offline First:** Ninguém merece app que congela quando a internet tá ruim. Ele salva tudo no dispositivo primeiro (`AsyncStorage`) e sobe pro Firestore em background. Assim a interface carrega instantaneamente.
+*   **Dashboard e Streaks:** Dá pra ver como tá a consistência nos últimos dias, acompanhar as ofensivas e bater metas.
+*   **Visual de responsa:** Interface toda baseada no estilo "Liquid Glass" (vidro fosco, gradientes e feedback tátil quando clica nas coisas).
 
-## 📱 Tecnologias Utilizadas
+## Stack 
 
-- **Framework principal:** [React Native](https://reactnative.dev/) com suporte [Expo](https://expo.dev/) (Managed Workflow)
-- **Backend & Cloud:** [Firebase](https://firebase.google.com/) (Authentication & Firestore)
-- **Armazenamento Local:** `@react-native-async-storage/async-storage`
-- **Animações e Gráficos:** `react-native-reanimated`, `react-native-svg`
-- **Funcionalidades do Dispositivo:** `expo-notifications`, `expo-sensors`, `expo-haptics`, `expo-blur`, `@react-native-google-signin/google-signin`
-- **Gestão de Rotas:** `react-navigation`
+*   **Mobile:** React Native + Expo (Managed Workflow)
+*   **Backend as a Service:** Firebase (Auth e Firestore)
+*   **Local Storage:** AsyncStorage
+*   **UI/Animações:** react-native-reanimated, react-native-svg, blur, haptics.
 
-## 🚀 Como Executar o Projeto Localmente
+## Rodando o projeto
 
-### Pré-requisitos
-- Node.js (versão 18+)
-- [Conta ativa no Firebase](https://console.firebase.google.com) (Para configuração caso re-crie o backend)
-- App _Expo Go_ instalado no seu dispositivo Android/iOS físico para testes.
+Se quiser clonar e rodar na sua máquina, segue o passo a passo:
 
-### Passo a Passo
+1.  Clona aí:
+    ```bash
+    git clone https://github.com/gabrielndo/supplement-tracker.git
+    cd supplement-tracker
+    ```
 
-1. **Clone o repositório:**
-   ```bash
-   git clone https://github.com/gabrielndo/supplement-tracker.git
-   cd supplement-tracker
-   ```
+2.  Instala os pacotes:
+    ```bash
+    npm install
+    ```
 
-2. **Instale as dependências:**
-   ```bash
-   npm install
-   ```
+3.  **Importante:** Pra rodar liso, você vai precisar do seu próprio projeto no Firebase. Confere se o `google-services.json` tá na raiz e se as chaves em `src/services/firebase.js` tão certinhas com as do seu projeto.
 
-3. **Configuração do Firebase:**
-   Para o aplicativo funcionar perfeitamente em modo de desenvolvimento próprio, certifique-se de que os arquivos de configuração (como o `google-services.json` contendo as credenciais de pacote para permissões do Google Auth) existam na raiz do projeto, e que as chaves em `src/services/firebase.js` sejam compatíveis com seu banco de dados Firebase.
+4.  Sobe o bundler:
+    ```bash
+    npx expo start -c
+    ```
+5. Só abrir no app do Expo Go no celular ou rodar no emulador.
 
-4. **Inicie o servidor do Expo:**
-   ```bash
-   npx expo start -c
-   ```
+## Build (Android)
 
-5. **Acesse no seu celular:**
-   Escaneie o QR Code que aparecerá no terminal com o aplicativo **Expo Go** (para Android) ou câmera padrão (para iOS).
-
-## 🔨 Gerando a Build para Produção (Android)
-
-Devido aos requisitos de serviços nativos (Google Sign-In), em alguns casos a melhor opção para testar o App rodando "livre" de forma nativa fora do Expo Go será usar o EAS Build.
+Como o app usa Google Sign-In nativo, pra gerar o .apk pra valer você pode usar o EAS:
 
 ```bash
 npm install -g eas-cli
@@ -63,6 +51,5 @@ eas login
 eas build -p android --profile production
 ```
 
-## 📜 Licença
-
-Desenvolvido para uso pessoal e open-source. Caso decida forkar o projeto, sinta-se livre para adaptá-lo às suas necessidades.
+## Licença
+Pode usar, forkar, copiar código, fica a vontade. O projeto é aberto.
