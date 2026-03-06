@@ -139,7 +139,6 @@ export const scheduleSupplementReminder = async (id, name, time) => {
     // Create trigger for daily at specific time
     // Android requires explicit 'daily' type or matching object structure, but avoiding 'calendar' type
     const trigger = {
-        type: 'daily',
         hour: hours,
         minute: minutes,
         repeats: true,
@@ -220,7 +219,6 @@ export const scheduleStreakReminder = async () => {
     await cancelStreakReminder();
 
     const trigger = {
-        type: 'daily',
         hour: 21, // 9 PM
         minute: 0,
         repeats: true,
