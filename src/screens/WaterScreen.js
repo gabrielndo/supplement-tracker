@@ -414,34 +414,33 @@ export default function WaterScreen({ navigation }) {
     };
 
     const loadData = async () => {
-        const profileData = await getProfile();
-        const waterData = await getWaterLog(today);
-        const historyData = await getWaterHistory(7);
-        const remindersData = await getWaterReminders();
-        const alreadyCelebrated = await hasShownCelebrationToday();
-
-        setProfile(profileData);
-        setTodayData(waterData);
-        setHistory(historyData);
-        setCelebrationShownToday(alreadyCelebrated);
-
-        if (remindersData && !Array.isArray(remindersData)) {
-            setReminderSettings(remindersData);
-        } else {
-            // Default if empty or legacy array
-            setReminderSettings({ enabled: false, intervalValue: '1', intervalUnit: 'h' });
-        }
-
-        // Load goal: Use Custom Goal if explicit, otherwise calculate
-        if (profileData) {
-            if (profileData.customWaterGoal) {
-                setGoal(profileData.customWaterGoal);
-            } else if (profileData.weight) {
-                setGoal(calculateWaterGoal(profileData.weight, profileData.gender));
+        const p1 = getProfile().then(profileData => {
+            setProfile(profileData);
+            if (profileData) {
+                if (profileData.customWaterGoal) {
+                    setGoal(profileData.customWaterGoal);
+                } else if (profileData.weight) {
+                    setGoal(calculateWaterGoal(profileData.weight, profileData.gender));
+                }
             }
-        }
-    };
+        });
 
+        const p2 = getWaterLog(today).then(setTodayData);
+        const p3 = getWaterHistory(7).then(setHistory);
+
+        const p4 = getWaterReminders().then(remindersData => {
+            if (remindersData && !Array.isArray(remindersData)) {
+                setReminderSettings(remindersData);
+            } else {
+                // Default if empty or legacy array
+                setReminderSettings({ enabled: false, intervalValue: '1', intervalUnit: 'h' });
+            }
+        });
+
+        const p5 = hasShownCelebrationToday().then(setCelebrationShownToday);
+
+        await Promise.all([p1, p2, p3, p4, p5]);
+    };
     const handleUpdateGoal = async () => {
         const goalValue = parseInt(newGoal);
         if (isNaN(goalValue) || goalValue <= 500) {

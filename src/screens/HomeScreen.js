@@ -130,27 +130,24 @@ export default function HomeScreen({ navigation }) {
     const today = new Date().toISOString().split('T')[0];
 
     const loadData = async () => {
-        const profileData = await getProfile();
-        const supplementsData = await getSupplements();
-        const streakData = await getStreak();
-        const todayLogData = await getConsumptionLog(today);
-        const waterLogData = await getWaterLog(today);
-
-        setProfile(profileData);
-        setSupplements(supplementsData);
-        setStreak(streakData);
-        setTodayLog(todayLogData);
-        setWaterData(waterLogData);
-
-        if (profileData?.weight) {
-            if (profileData.customWaterGoal) {
-                setWaterGoal(profileData.customWaterGoal);
-            } else {
-                setWaterGoal(calculateWaterGoal(profileData.weight, profileData.gender));
+        const p1 = getProfile().then(profileData => {
+            setProfile(profileData);
+            if (profileData?.weight) {
+                if (profileData.customWaterGoal) {
+                    setWaterGoal(profileData.customWaterGoal);
+                } else {
+                    setWaterGoal(calculateWaterGoal(profileData.weight, profileData.gender));
+                }
             }
-        }
-    };
+        });
 
+        const p2 = getSupplements().then(setSupplements);
+        const p3 = getStreak().then(setStreak);
+        const p4 = getConsumptionLog(today).then(setTodayLog);
+        const p5 = getWaterLog(today).then(setWaterData);
+
+        await Promise.all([p1, p2, p3, p4, p5]);
+    };
     useFocusEffect(
         useCallback(() => {
             loadData();

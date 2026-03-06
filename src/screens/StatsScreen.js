@@ -135,22 +135,18 @@ export default function StatsScreen({ navigation }) {
     );
 
     const loadData = async () => {
-        const streakData = await getStreak();
-        const suppHistory = await getConsumptionHistory(7);
-        const watHistory = await getWaterHistory(7);
-        const supps = await getSupplements();
-        const profile = await getProfile();
+        const p1 = getStreak().then(setStreak);
+        const p2 = getConsumptionHistory(7).then(setSupplementHistory);
+        const p3 = getWaterHistory(7).then(setWaterHistory);
+        const p4 = getSupplements().then(setSupplements);
+        const p5 = getProfile().then(profile => {
+            if (profile?.weight) {
+                setWaterGoal(calculateWaterGoal(profile.weight, profile.gender));
+            }
+        });
 
-        setStreak(streakData);
-        setSupplementHistory(suppHistory);
-        setWaterHistory(watHistory);
-        setSupplements(supps);
-
-        if (profile?.weight) {
-            setWaterGoal(calculateWaterGoal(profile.weight, profile.gender));
-        }
+        await Promise.all([p1, p2, p3, p4, p5]);
     };
-
     const onRefresh = async () => {
         lightImpact();
         setRefreshing(true);
