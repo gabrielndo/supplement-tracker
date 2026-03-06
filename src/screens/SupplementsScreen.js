@@ -511,7 +511,6 @@ export default function SupplementsScreen() {
                                                         selectionFeedback();
                                                         setReminderTime(timeString);
                                                         setCustomReminderTime(timeString);
-                                                        setShowCustomTimeInput(false);
                                                     }
                                                 }}
                                                 textColor={colors.text}
@@ -519,6 +518,12 @@ export default function SupplementsScreen() {
                                                 themeVariant="dark"
                                                 style={{ backgroundColor: 'transparent', height: 120 }}
                                             />
+                                            <TouchableOpacity
+                                                style={{ marginTop: 8, alignSelf: 'center', backgroundColor: 'rgba(99, 102, 241, 0.2)', paddingHorizontal: 16, paddingVertical: 6, borderRadius: 16 }}
+                                                onPress={() => { lightImpact(); setShowCustomTimeInput(false); }}
+                                            >
+                                                <Text style={{ color: colors.primary, fontWeight: '600' }}>Confirmar Horário</Text>
+                                            </TouchableOpacity>
                                         </View>
                                     )}
                                 </View>
@@ -675,7 +680,6 @@ export default function SupplementsScreen() {
                                                 selectionFeedback();
                                                 setCustomReminderTimeNew(timeString);
                                                 setCustomTimePickerValueNew(timeString);
-                                                setShowCustomTimeInputNew(false);
                                             }
                                         }}
                                         textColor={colors.text}
@@ -683,6 +687,12 @@ export default function SupplementsScreen() {
                                         themeVariant="dark"
                                         style={{ backgroundColor: 'transparent', height: 120 }}
                                     />
+                                    <TouchableOpacity
+                                        style={{ marginTop: 8, alignSelf: 'center', backgroundColor: 'rgba(99, 102, 241, 0.2)', paddingHorizontal: 16, paddingVertical: 6, borderRadius: 16 }}
+                                        onPress={() => { lightImpact(); setShowCustomTimeInputNew(false); }}
+                                    >
+                                        <Text style={{ color: colors.primary, fontWeight: '600' }}>Confirmar Horário</Text>
+                                    </TouchableOpacity>
                                 </View>
                             )}
                         </View>
