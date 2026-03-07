@@ -6,7 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { View, ActivityIndicator } from 'react-native';
-import { lightImpact } from './src/services/haptics';
+import { lightImpact, selectionFeedback } from './src/services/haptics';
 import * as Notifications from 'expo-notifications';
 import { configureNotifications, requestPermissions, handleNotificationAction, WATER_CATEGORY } from './src/services/notifications';
 import { onAuthStateChange } from './src/services/authStorage';
@@ -127,7 +127,7 @@ function AppContent() {
           tabBarShowLabel: false,
           tabBarBackground: () => (
             <BlurView
-              intensity={100}
+              intensity={150}
               tint="dark"
               style={{
                 position: 'absolute',
@@ -137,9 +137,9 @@ function AppContent() {
                 bottom: 0,
                 borderRadius: 25,
                 overflow: 'hidden',
-                backgroundColor: 'rgba(31, 41, 55, 0.75)',
+                backgroundColor: 'rgba(10, 15, 30, 0.85)',
                 borderWidth: 1,
-                borderColor: 'rgba(255, 255, 255, 0.15)',
+                borderColor: 'rgba(255, 255, 255, 0.12)',
               }}
             />
           ),
@@ -171,7 +171,7 @@ function AppContent() {
         })}
         listeners={({ navigation }) => ({
           tabPress: () => {
-            lightImpact();
+            selectionFeedback();
           },
         })}
       >
