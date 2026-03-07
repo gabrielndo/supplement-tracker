@@ -27,6 +27,7 @@ export const configureNotifications = async () => {
             importance: Notifications.AndroidImportance.MAX,
             vibrationPattern: [0, 250, 250, 250],
             lightColor: colors.primary,
+            sound: false,
         });
     }
 
@@ -108,7 +109,7 @@ export const scheduleWaterReminder = async (intervalMinutes) => {
             body: "Mantenha o foco na sua meta diária de água.",
             categoryIdentifier: WATER_CATEGORY,
             data: { type: 'water' },
-            sound: true,
+            sound: false,
             priority: Notifications.AndroidNotificationPriority.MAX,
             channelId: 'default',
         },
@@ -153,7 +154,7 @@ export const scheduleSupplementReminder = async (id, name, time) => {
             body: `Está na hora de tomar: ${name}`,
             categoryIdentifier: SUPPLEMENT_CATEGORY,
             data: { type: 'supplement', supplementId: id },
-            sound: true,
+            sound: false,
             priority: Notifications.AndroidNotificationPriority.MAX,
             channelId: 'default',
         },
@@ -201,7 +202,7 @@ export const scheduleNotification = async (title, body, seconds = 1) => {
         content: {
             title,
             body,
-            sound: true,
+            sound: false,
             color: colors.primary,
             priority: Notifications.AndroidNotificationPriority.MAX,
             channelId: 'default',
@@ -238,7 +239,7 @@ export const scheduleStreakReminder = async () => {
             body: "Não esqueça de registrar seus suplementos de hoje para manter sua sequência!",
             categoryIdentifier: SUPPLEMENT_CATEGORY,
             data: { type: 'streak_reminder' },
-            sound: true,
+            sound: false,
             priority: Notifications.AndroidNotificationPriority.MAX,
             channelId: 'default',
         },

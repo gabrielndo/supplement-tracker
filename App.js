@@ -193,6 +193,15 @@ export default function App() {
     userName: '',
   });
 
+  // Request notification permissions immediately on first launch
+  useEffect(() => {
+    const initNotifications = async () => {
+      await configureNotifications();
+      await requestPermissions();
+    };
+    initNotifications();
+  }, []);
+
   useEffect(() => {
     // Firebase auth state listener - auto-updates on login/logout
     const unsubscribe = onAuthStateChange(async (user) => {
