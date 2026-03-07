@@ -502,28 +502,28 @@ export default function SupplementsScreen() {
                                                 value={new Date(2000, 0, 1, parseInt(customReminderTime.split(':')[0] || '8'), parseInt(customReminderTime.split(':')[1] || '0'))}
                                                 mode="time"
                                                 is24Hour={true}
-                                                display="spinner"
+                                                display="default"
                                                 onChange={(event, selectedDate) => {
-                                                    if (selectedDate) {
+                                                    if (Platform.OS === 'android') {
+                                                        setShowCustomTimeInput(false);
+                                                    }
+                                                    if (event.type === 'set' && selectedDate) {
                                                         const hours = selectedDate.getHours().toString().padStart(2, '0');
                                                         const minutes = selectedDate.getMinutes().toString().padStart(2, '0');
                                                         const timeString = `${hours}:${minutes}`;
                                                         selectionFeedback();
                                                         setReminderTime(timeString);
                                                         setCustomReminderTime(timeString);
+                                                        if (Platform.OS === 'ios') {
+                                                            setShowCustomTimeInput(false);
+                                                        }
+                                                    } else if (event.type === 'dismissed' && Platform.OS === 'ios') {
+                                                        setShowCustomTimeInput(false);
                                                     }
                                                 }}
                                                 textColor={colors.text}
                                                 accentColor="#ffffff"
-                                                themeVariant="dark"
-                                                style={{ backgroundColor: 'transparent', height: 120 }}
                                             />
-                                            <TouchableOpacity
-                                                style={{ marginTop: 8, alignSelf: 'center', backgroundColor: 'rgba(99, 102, 241, 0.2)', paddingHorizontal: 16, paddingVertical: 6, borderRadius: 16 }}
-                                                onPress={() => { lightImpact(); setShowCustomTimeInput(false); }}
-                                            >
-                                                <Text style={{ color: colors.primary, fontWeight: '600' }}>Confirmar Horário</Text>
-                                            </TouchableOpacity>
                                         </View>
                                     )}
                                 </View>
@@ -671,28 +671,28 @@ export default function SupplementsScreen() {
                                         value={new Date(2000, 0, 1, parseInt(customTimePickerValueNew.split(':')[0] || '8'), parseInt(customTimePickerValueNew.split(':')[1] || '0'))}
                                         mode="time"
                                         is24Hour={true}
-                                        display="spinner"
+                                        display="default"
                                         onChange={(event, selectedDate) => {
-                                            if (selectedDate) {
+                                            if (Platform.OS === 'android') {
+                                                setShowCustomTimeInputNew(false);
+                                            }
+                                            if (event.type === 'set' && selectedDate) {
                                                 const hours = selectedDate.getHours().toString().padStart(2, '0');
                                                 const minutes = selectedDate.getMinutes().toString().padStart(2, '0');
                                                 const timeString = `${hours}:${minutes}`;
                                                 selectionFeedback();
                                                 setCustomReminderTimeNew(timeString);
                                                 setCustomTimePickerValueNew(timeString);
+                                                if (Platform.OS === 'ios') {
+                                                    setShowCustomTimeInputNew(false);
+                                                }
+                                            } else if (event.type === 'dismissed' && Platform.OS === 'ios') {
+                                                setShowCustomTimeInputNew(false);
                                             }
                                         }}
                                         textColor={colors.text}
                                         accentColor="#ffffff"
-                                        themeVariant="dark"
-                                        style={{ backgroundColor: 'transparent', height: 120 }}
                                     />
-                                    <TouchableOpacity
-                                        style={{ marginTop: 8, alignSelf: 'center', backgroundColor: 'rgba(99, 102, 241, 0.2)', paddingHorizontal: 16, paddingVertical: 6, borderRadius: 16 }}
-                                        onPress={() => { lightImpact(); setShowCustomTimeInputNew(false); }}
-                                    >
-                                        <Text style={{ color: colors.primary, fontWeight: '600' }}>Confirmar Horário</Text>
-                                    </TouchableOpacity>
                                 </View>
                             )}
                         </View>
