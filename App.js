@@ -6,7 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { View, ActivityIndicator } from 'react-native';
-import { lightImpact, selectionFeedback } from './src/services/haptics';
+import { lightImpact, mediumImpact } from './src/services/haptics';
 import * as Notifications from 'expo-notifications';
 import { configureNotifications, requestPermissions, handleNotificationAction, WATER_CATEGORY } from './src/services/notifications';
 import { onAuthStateChange } from './src/services/authStorage';
@@ -137,9 +137,9 @@ function AppContent() {
                 bottom: 0,
                 borderRadius: 25,
                 overflow: 'hidden',
-                backgroundColor: 'rgba(10, 15, 30, 0.85)',
+                backgroundColor: 'rgba(31, 41, 55, 0.75)',
                 borderWidth: 1,
-                borderColor: 'rgba(255, 255, 255, 0.12)',
+                borderColor: 'rgba(255, 255, 255, 0.15)',
               }}
             />
           ),
@@ -168,10 +168,12 @@ function AppContent() {
             alignItems: 'center',
           },
           headerShown: false,
+          animation: 'fade',
+          animationDuration: 200,
         })}
         listeners={({ navigation }) => ({
           tabPress: () => {
-            selectionFeedback();
+            mediumImpact();
           },
         })}
       >
