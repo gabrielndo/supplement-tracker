@@ -54,7 +54,14 @@ export const getProfile = async (uid = null) => {
     try {
         // 1. Return local cache instantly
         const cached = await AsyncStorage.getItem(KEYS.PROFILE);
-        if (cached) return JSON.parse(cached);
+        if (cached) {
+            try {
+                return JSON.parse(cached);
+            } catch (e) {
+                console.error('JSON parse error in getProfile:', e);
+                return null;
+            }
+        }
 
         // 2. Cache miss → fetch from Firestore
         const userId = uid || getUserId();
@@ -101,7 +108,14 @@ export const getSupplements = async () => {
     try {
         // 1. Return local cache instantly
         const cached = await AsyncStorage.getItem(KEYS.SUPPLEMENTS);
-        if (cached !== null) return JSON.parse(cached);
+        if (cached !== null) {
+            try {
+                return JSON.parse(cached);
+            } catch (e) {
+                console.error('JSON parse error in getSupplements:', e);
+                return [];
+            }
+        }
 
         // 2. Cache miss → fetch from Firestore
         const userId = getUserId();
@@ -148,8 +162,14 @@ export const getWaterLog = async (date) => {
     } catch (error) {
         console.error('Error getting water log:', error);
         const data = await AsyncStorage.getItem(KEYS.WATER_LOG);
-        const logs = data ? JSON.parse(data) : {};
-        return logs[date] || { amount: 0, entries: [] };
+        if (!data) return { amount: 0, entries: [] };
+        try {
+            const logs = JSON.parse(data);
+            return logs[date] || { amount: 0, entries: [] };
+        } catch (e) {
+            console.error('JSON parse error in getWaterLog:', e);
+            return { amount: 0, entries: [] };
+        }
     }
 };
 
@@ -328,8 +348,14 @@ export const getConsumptionLog = async (date) => {
     try {
         // 1. Check local cache first
         const cached = await AsyncStorage.getItem(KEYS.CONSUMPTION_LOG);
-        const localLogs = cached ? JSON.parse(cached) : {};
-        if (localLogs[date] !== undefined) return localLogs[date];
+        if (cached) {
+            try {
+                const localLogs = JSON.parse(cached);
+                if (localLogs[date] !== undefined) return localLogs[date];
+            } catch (e) {
+                console.error('JSON parse error in getConsumptionLog:', e);
+            }
+        }
 
         // 2. Cache miss → Firestore
         const userId = getUserId();
@@ -362,9 +388,10 @@ export const getStreak = async () => {
         const logs = consumptionRaw ? JSON.parse(consumptionRaw) : {};
         if (supplements.length === 0) return 0;
 
+        // Check last 30 days for streak
         let streak = 0;
         const today = new Date();
-        for (let i = 0; i < 365; i++) {
+        for (let i = 0; i < 30; i++) {
             const date = new Date(today);
             date.setDate(date.getDate() - i);
             const dateStr = date.toISOString().split('T')[0];

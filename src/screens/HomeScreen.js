@@ -139,12 +139,12 @@ export default function HomeScreen({ navigation }) {
                     setWaterGoal(calculateWaterGoal(profileData.weight, profileData.gender));
                 }
             }
-        });
+        }).catch(e => console.warn('Load profile failed:', e));
 
-        const p2 = getSupplements().then(setSupplements);
-        const p3 = getStreak().then(setStreak);
-        const p4 = getConsumptionLog(today).then(setTodayLog);
-        const p5 = getWaterLog(today).then(setWaterData);
+        const p2 = getSupplements().then(setSupplements).catch(e => console.warn('Load supplements failed:', e));
+        const p3 = getStreak().then(setStreak).catch(e => console.warn('Load streak failed:', e));
+        const p4 = getConsumptionLog(today).then(setTodayLog).catch(e => console.warn('Load log failed:', e));
+        const p5 = getWaterLog(today).then(setWaterData).catch(e => console.warn('Load water failed:', e));
 
         await Promise.all([p1, p2, p3, p4, p5]);
     };
@@ -200,21 +200,41 @@ export default function HomeScreen({ navigation }) {
             setSupplementToRemove(supp);
             setConfirmRemoveVisible(true);
         } else {
-            // Mark as taken
+            // Optimistic Update
+            setTodayLog(prev => [...prev, supplementId]);
             successFeedback();
-            await logConsumption(supplementId, today);
-            await loadData();
+            
+            try {
+                await logConsumption(supplementId, today);
+                // Background refresh to confirm state
+                loadData();
+            } catch (error) {
+                // Rollback on error
+                setTodayLog(prev => prev.filter(id => id !== supplementId));
+                errorFeedback();
+            }
 
             // Check for achievements
-            await checkAndNotify(waterGoal);
+            checkAndNotify(waterGoal).catch(() => {});
         }
     };
 
     const confirmRemoveConsumption = async () => {
         if (supplementToRemove) {
+            const sid = supplementToRemove.id;
+            // Optimistic Update
+            setTodayLog(prev => prev.filter(id => id !== sid));
             errorFeedback();
-            await removeConsumption(supplementToRemove.id, today);
-            await loadData();
+            
+            try {
+                await removeConsumption(sid, today);
+                // Background refresh
+                loadData();
+            } catch (error) {
+                // Rollback
+                setTodayLog(prev => [...prev, sid]);
+                console.error('Remove consumption failed:', error);
+            }
         }
         setConfirmRemoveVisible(false);
         setSupplementToRemove(null);

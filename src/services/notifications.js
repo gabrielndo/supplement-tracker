@@ -110,8 +110,6 @@ export const scheduleWaterReminder = async (intervalMinutes) => {
             categoryIdentifier: WATER_CATEGORY,
             data: { type: 'water' },
             sound: false,
-            priority: Notifications.AndroidNotificationPriority.MAX,
-            channelId: 'default',
         },
         trigger,
     });
@@ -148,20 +146,23 @@ export const scheduleSupplementReminder = async (id, name, time) => {
         repeats: true,
     };
 
-    const notificationId = await Notifications.scheduleNotificationAsync({
-        content: {
-            title: `Hora do Suplemento 💊`,
-            body: `Está na hora de tomar: ${name}`,
-            categoryIdentifier: SUPPLEMENT_CATEGORY,
-            data: { type: 'supplement', supplementId: id },
-            sound: false,
-            priority: Notifications.AndroidNotificationPriority.MAX,
-            channelId: 'default',
-        },
-        trigger,
-    });
+    try {
+        const notificationId = await Notifications.scheduleNotificationAsync({
+            content: {
+                title: `Hora do Suplemento 💊`,
+                body: `Está na hora de tomar: ${name}`,
+                categoryIdentifier: SUPPLEMENT_CATEGORY,
+                data: { type: 'supplement', supplementId: id },
+                sound: false,
+            },
+            trigger,
+        });
 
-    return notificationId;
+        return notificationId;
+    } catch (error) {
+        console.warn('Error scheduling supplement reminder:', error);
+        return null;
+    }
 };
 
 /**
@@ -198,19 +199,21 @@ export const handleNotificationAction = async (response) => {
  * Simple local notification (legacy support)
  */
 export const scheduleNotification = async (title, body, seconds = 1) => {
-    await Notifications.scheduleNotificationAsync({
-        content: {
-            title,
-            body,
-            sound: false,
-            color: colors.primary,
-            priority: Notifications.AndroidNotificationPriority.MAX,
-            channelId: 'default',
-        },
-        trigger: {
-            seconds: seconds,
-        },
-    });
+    try {
+        await Notifications.scheduleNotificationAsync({
+            content: {
+                title,
+                body,
+                sound: false,
+                color: colors.primary,
+            },
+            trigger: {
+                seconds: seconds,
+            },
+        });
+    } catch (error) {
+        console.warn('Error scheduling local notification:', error);
+    }
 };
 
 export const sendAchievementNotification = async (achievementTitle) => {
@@ -233,18 +236,20 @@ export const scheduleStreakReminder = async () => {
         repeats: true,
     };
 
-    await Notifications.scheduleNotificationAsync({
-        content: {
-            title: "Lembrete Diário 🔥",
-            body: "Não esqueça de registrar seus suplementos de hoje para manter sua sequência!",
-            categoryIdentifier: SUPPLEMENT_CATEGORY,
-            data: { type: 'streak_reminder' },
-            sound: false,
-            priority: Notifications.AndroidNotificationPriority.MAX,
-            channelId: 'default',
-        },
-        trigger,
-    });
+    try {
+        await Notifications.scheduleNotificationAsync({
+            content: {
+                title: "Lembrete Diário 🔥",
+                body: "Não esqueça de registrar seus suplementos de hoje para manter sua sequência!",
+                categoryIdentifier: SUPPLEMENT_CATEGORY,
+                data: { type: 'streak_reminder' },
+                sound: false,
+            },
+            trigger,
+        });
+    } catch (error) {
+        console.warn('Error scheduling streak reminder:', error);
+    }
 };
 
 /**
