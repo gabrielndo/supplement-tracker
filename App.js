@@ -6,7 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { View, ActivityIndicator } from 'react-native';
-import { lightImpact } from './src/services/haptics';
+import { lightImpact, mediumImpact } from './src/services/haptics';
 import * as Notifications from 'expo-notifications';
 import { configureNotifications, requestPermissions, handleNotificationAction, WATER_CATEGORY, listScheduledNotifications, testImmediateNotification, testSupplementNotification } from './src/services/notifications';
 import { onAuthStateChange } from './src/services/authStorage';
@@ -176,13 +176,13 @@ function AppContent() {
         })}
         listeners={({ navigation }) => ({
           tabPress: () => {
-            lightImpact();
+            mediumImpact();
           },
         })}
       >
         <Tab.Screen name="Home" component={HomeScreen} options={{ title: 'Início' }} />
-        <Tab.Screen name="Perfil" component={ProfileStackNavigator} />
         <Tab.Screen name="Suplementos" component={SupplementsScreen} />
+        <Tab.Screen name="Perfil" component={ProfileStackNavigator} />
         <Tab.Screen name="Água" component={WaterStackNavigator} />
         <Tab.Screen name="Estatísticas" component={StatsStackNavigator} />
       </Tab.Navigator>
