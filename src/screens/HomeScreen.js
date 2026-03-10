@@ -156,24 +156,23 @@ export default function HomeScreen({ navigation }) {
     useEffect(() => {
         const subscription = AppState.addEventListener('change', nextAppState => {
             if (nextAppState === 'active') {
-                const now = getTodayStr();
-                loadData(now);
+                loadData(getTodayStr());
             }
         });
 
         // Interval to check for midnight rollover every minute
         const interval = setInterval(() => {
             const now = getTodayStr();
-            if (now !== today) {
-                loadData(now);
-            }
+            // We don't want to depend on 'today' state here to avoid re-running effect
+            // loadData already updates the 'today' state
+            loadData(now);
         }, 60000);
 
         return () => {
             subscription.remove();
             clearInterval(interval);
         };
-    }, [today]);
+    }, []); // No dependencies to prevent re-subscriptions
 
     useFocusEffect(
         useCallback(() => {

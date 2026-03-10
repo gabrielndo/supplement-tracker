@@ -59,7 +59,7 @@ function ProfileStackNavigator() {
 }
 
 // Main App Component wrapper for navigation refs
-function AppContent() {
+function AppContent({ authState }) {
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -278,7 +278,7 @@ export default function App() {
   // Authenticated and has profile -> Show main app
   return (
     <NavigationContainer>
-      <AppContent />
+      <AppContent authState={authState} />
     </NavigationContainer>
   );
 }
