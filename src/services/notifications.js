@@ -16,8 +16,8 @@ export const configureNotifications = async () => {
     Notifications.setNotificationHandler({
         handleNotification: async () => ({
             shouldShowAlert: true,
-            shouldPlaySound: true,
-            shouldSetBadge: false,
+            shouldPlaySound: false,
+            shouldSetBadge: true,
         }),
     });
 
@@ -110,6 +110,8 @@ export const scheduleWaterReminder = async (intervalMinutes) => {
             categoryIdentifier: WATER_CATEGORY,
             data: { type: 'water' },
             sound: false,
+            priority: Notifications.AndroidNotificationPriority.MAX,
+            vibrationPattern: [0, 250, 250, 250],
         },
         trigger,
     });
@@ -154,6 +156,9 @@ export const scheduleSupplementReminder = async (id, name, time) => {
                 categoryIdentifier: SUPPLEMENT_CATEGORY,
                 data: { type: 'supplement', supplementId: id },
                 sound: false,
+                priority: Notifications.AndroidNotificationPriority.MAX,
+                vibrationPattern: [0, 250, 250, 250],
+                lockScreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
             },
             trigger,
         });
@@ -244,6 +249,7 @@ export const scheduleStreakReminder = async () => {
                 categoryIdentifier: SUPPLEMENT_CATEGORY,
                 data: { type: 'streak_reminder' },
                 sound: false,
+                priority: Notifications.AndroidNotificationPriority.HIGH,
             },
             trigger,
         });
@@ -262,4 +268,29 @@ export const cancelStreakReminder = async () => {
             await Notifications.cancelScheduledNotificationAsync(item.identifier);
         }
     }
+};
+/**
+ * Debug: List all scheduled notifications
+ */
+export const listScheduledNotifications = async () => {
+    const scheduled = await Notifications.getAllScheduledNotificationsAsync();
+    console.log('--- NOTIFICAÇÕES AGENDADAS ---');
+    console.log(`Total: ${scheduled.length}`);
+    scheduled.forEach((n, i) => {
+        console.log(`[${i + 1}] ID: ${n.identifier} | Título: ${n.content.title} | Gatilho:`, n.trigger);
+    });
+    console.log('------------------------------');
+    return scheduled;
+};
+
+/**
+ * Debug: Test immediate notification
+ */
+export const testImmediateNotification = async () => {
+    console.log('Enviando notificação de teste em 5 segundos...');
+    return await scheduleNotification(
+        "Teste MeusSuple ✅",
+        "Esta é uma notificação de teste para verificar se o sistema está funcionando.",
+        5
+    );
 };

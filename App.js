@@ -8,7 +8,7 @@ import { BlurView } from 'expo-blur';
 import { View, ActivityIndicator } from 'react-native';
 import { lightImpact } from './src/services/haptics';
 import * as Notifications from 'expo-notifications';
-import { configureNotifications, requestPermissions, handleNotificationAction, WATER_CATEGORY } from './src/services/notifications';
+import { configureNotifications, requestPermissions, handleNotificationAction, WATER_CATEGORY, listScheduledNotifications, testImmediateNotification } from './src/services/notifications';
 import { onAuthStateChange } from './src/services/authStorage';
 import { getProfile } from './src/services/storage';
 
@@ -66,6 +66,8 @@ function AppContent() {
     const initNotifications = async () => {
       await configureNotifications();
       await requestPermissions();
+      await listScheduledNotifications();
+      // testImmediateNotification(); // Uncomment to test on launch
     };
 
     initNotifications();
@@ -80,6 +82,7 @@ function AppContent() {
       handleNotificationAction(response);
 
       // Handle Navigation
+      console.log('Notificação recebida!', response.notification.request.content.title);
       if (actionIdentifier === Notifications.DEFAULT_ACTION_IDENTIFIER) {
         if (category === WATER_CATEGORY || data?.type === 'water') {
           navigation.navigate('Água', { screen: 'WaterMain' });
