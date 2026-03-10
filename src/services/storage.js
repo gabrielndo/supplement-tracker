@@ -348,9 +348,10 @@ export const getConsumptionLog = async (date) => {
     try {
         // 1. Check local cache first
         const cached = await AsyncStorage.getItem(KEYS.CONSUMPTION_LOG);
+        let localLogs = {};
         if (cached) {
             try {
-                const localLogs = JSON.parse(cached);
+                localLogs = JSON.parse(cached);
                 if (localLogs[date] !== undefined) return localLogs[date];
             } catch (e) {
                 console.error('JSON parse error in getConsumptionLog:', e);

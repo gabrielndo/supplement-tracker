@@ -149,7 +149,6 @@ export const scheduleSupplementReminder = async (id, name, time) => {
     };
 
     try {
-        console.log(`Agendando suplemento: ${name} para as ${time} (H:${hours} M:${minutes})`);
         const notificationId = await Notifications.scheduleNotificationAsync({
             content: {
                 title: `Hora do Suplemento 💊`,
@@ -164,10 +163,9 @@ export const scheduleSupplementReminder = async (id, name, time) => {
             trigger,
         });
 
-        console.log(`Suplemento agendado com sucesso! ID da notificação: ${notificationId}`);
         return notificationId;
     } catch (error) {
-        console.error('ERRO ao agendar lembrete de suplemento:', error);
+        console.warn('Erro ao agendar lembrete de suplemento:', error);
         return null;
     }
 };
@@ -269,80 +267,5 @@ export const cancelStreakReminder = async () => {
         if (item.content.data?.type === 'streak_reminder') {
             await Notifications.cancelScheduledNotificationAsync(item.identifier);
         }
-    }
-};
-/**
- * Debug: List all scheduled notifications
- */
-export const listScheduledNotifications = async () => {
-    const scheduled = await Notifications.getAllScheduledNotificationsAsync();
-    console.log('--- NOTIFICAÇÕES AGENDADAS ---');
-    console.log(`Total: ${scheduled.length}`);
-    scheduled.forEach((n, i) => {
-        const type = n.trigger.type || (n.trigger.hour !== undefined ? 'calendar' : 'unknown');
-        console.log(`[${i + 1}] ID: ${n.identifier} | Título: ${n.content.title} | Gatilho (${type}):`, JSON.stringify(n.trigger));
-    });
-    console.log('------------------------------');
-    return scheduled;
-};
-
-/**
- * Debug: Test immediate notification
- */
-export const testImmediateNotification = async () => {
-    console.log('Enviando notificação de teste em 5 segundos...');
-    return await scheduleNotification(
-        "Teste MeusSuple ✅",
-        "Esta é uma notificação de teste para verificar se o sistema está funcionando.",
-        5
-    );
-};
-
-/**
- * Debug: Test supplement notification in 60 seconds
- */
-export const testSupplementNotification = async () => {
-    const now = new Date();
-    const testDate = new Date(now.getTime() + 65 * 1000); // 65 seconds
-    const h = testDate.getHours();
-    const m = testDate.getMinutes();
-    const timeStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
-    
-    console.log(`--- TESTE SUPLEMENTO ---`);
-    console.log(`Hora atual: ${now.toLocaleTimeString()}`);
-    console.log(`Agendando para: ${timeStr}`);
-    
-    return await scheduleSupplementReminder('debug-test', 'Teste de 1 Minuto', timeStr);
-};
-
-/**
- * Debug: Test supplement notification via INTERVAL (60 seconds)
- * This helps verify if the issue is strictly the DAILY calendar trigger.
- */
-export const testSupplementInterval = async () => {
-    console.log('--- TESTE SUPLEMENTO (INTERVALO 60s) ---');
-    const trigger = {
-        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
-        seconds: 60,
-        repeats: false,
-    };
-    
-    try {
-        const id = await Notifications.scheduleNotificationAsync({
-            content: {
-                title: `Teste Suplemento 💊`,
-                body: `Teste de 1 minuto via intervalo`,
-                categoryIdentifier: SUPPLEMENT_CATEGORY,
-                data: { type: 'supplement', supplementId: 'debug-interval' },
-                sound: false,
-                priority: Notifications.AndroidNotificationPriority.MAX,
-                vibrationPattern: [0, 250, 250, 250],
-            },
-            trigger,
-        });
-        console.log(`Teste agendado com sucesso! ID: ${id}`);
-        return id;
-    } catch (e) {
-        console.error('Falha no agendamento de teste:', e);
     }
 };

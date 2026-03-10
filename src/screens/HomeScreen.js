@@ -9,6 +9,7 @@ import {
     Pressable,
     Modal,
     TouchableOpacity,
+    AppState,
 } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -127,9 +128,11 @@ export default function HomeScreen({ navigation }) {
     const [confirmRemoveVisible, setConfirmRemoveVisible] = useState(false);
     const [supplementToRemove, setSupplementToRemove] = useState(null);
 
-    const today = new Date().toISOString().split('T')[0];
+    const getTodayStr = () => new Date().toISOString().split('T')[0];
+    const [today, setToday] = useState(getTodayStr());
 
-    const loadData = async () => {
+    const loadData = async (targetDate = getTodayStr()) => {
+        setToday(targetDate);
         const p1 = getProfile().then(profileData => {
             setProfile(profileData);
             if (profileData?.weight) {
@@ -143,14 +146,38 @@ export default function HomeScreen({ navigation }) {
 
         const p2 = getSupplements().then(setSupplements).catch(e => console.warn('Load supplements failed:', e));
         const p3 = getStreak().then(setStreak).catch(e => console.warn('Load streak failed:', e));
-        const p4 = getConsumptionLog(today).then(setTodayLog).catch(e => console.warn('Load log failed:', e));
-        const p5 = getWaterLog(today).then(setWaterData).catch(e => console.warn('Load water failed:', e));
+        const p4 = getConsumptionLog(targetDate).then(setTodayLog).catch(e => console.warn('Load log failed:', e));
+        const p5 = getWaterLog(targetDate).then(setWaterData).catch(e => console.warn('Load water failed:', e));
 
         await Promise.all([p1, p2, p3, p4, p5]);
     };
+
+    // AppState & Midnight Listener for Reset
+    useEffect(() => {
+        const subscription = AppState.addEventListener('change', nextAppState => {
+            if (nextAppState === 'active') {
+                const now = getTodayStr();
+                loadData(now);
+            }
+        });
+
+        // Interval to check for midnight rollover every minute
+        const interval = setInterval(() => {
+            const now = getTodayStr();
+            if (now !== today) {
+                loadData(now);
+            }
+        }, 60000);
+
+        return () => {
+            subscription.remove();
+            clearInterval(interval);
+        };
+    }, [today]);
+
     useFocusEffect(
         useCallback(() => {
-            loadData();
+            loadData(getTodayStr());
         }, [])
     );
 
@@ -205,9 +232,10 @@ export default function HomeScreen({ navigation }) {
             successFeedback();
             
             try {
-                await logConsumption(supplementId, today);
+                const currentToday = getTodayStr();
+                await logConsumption(supplementId, currentToday);
                 // Background refresh to confirm state
-                loadData();
+                loadData(currentToday);
             } catch (error) {
                 // Rollback on error
                 setTodayLog(prev => prev.filter(id => id !== supplementId));
@@ -227,9 +255,10 @@ export default function HomeScreen({ navigation }) {
             errorFeedback();
             
             try {
-                await removeConsumption(sid, today);
+                const currentToday = getTodayStr();
+                await removeConsumption(sid, currentToday);
                 // Background refresh
-                loadData();
+                loadData(currentToday);
             } catch (error) {
                 // Rollback
                 setTodayLog(prev => [...prev, sid]);

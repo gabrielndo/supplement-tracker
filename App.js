@@ -5,10 +5,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
-import { View, ActivityIndicator } from 'react-native';
+import { View, ActivityIndicator, Image } from 'react-native';
 import { lightImpact, mediumImpact } from './src/services/haptics';
 import * as Notifications from 'expo-notifications';
-import { configureNotifications, requestPermissions, handleNotificationAction, WATER_CATEGORY, listScheduledNotifications, testImmediateNotification, testSupplementNotification, testSupplementInterval } from './src/services/notifications';
+import { configureNotifications, requestPermissions, handleNotificationAction, WATER_CATEGORY } from './src/services/notifications';
 import { onAuthStateChange } from './src/services/authStorage';
 import { getProfile } from './src/services/storage';
 
@@ -66,26 +66,18 @@ function AppContent() {
     const initNotifications = async () => {
       await configureNotifications();
       await requestPermissions();
-      await listScheduledNotifications();
-      // testImmediateNotification(); 
-      // testSupplementNotification();
-      testSupplementInterval(); // NEW: Test with 60s interval
     };
 
     initNotifications();
 
-    // Listen for user interaction with notifications
+    // Listen for user interaction with notifications (Navigation only)
     const subscription = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log('--- INTERAÇÃO COM NOTIFICAÇÃO ---');
       const { actionIdentifier, notification } = response;
       const data = notification.request.content.data;
       const category = notification.request.content.categoryIdentifier;
 
-      // Handle Actions (Background/Foreground)
       handleNotificationAction(response);
 
-      // Handle Navigation
-      console.log('Notificação recebida!', response.notification.request.content.title);
       if (actionIdentifier === Notifications.DEFAULT_ACTION_IDENTIFIER) {
         if (category === WATER_CATEGORY || data?.type === 'water') {
           navigation.navigate('Água', { screen: 'WaterMain' });
@@ -95,15 +87,8 @@ function AppContent() {
       }
     });
 
-    // Listen for notification arrival in foreground
-    const foregroundSubscription = Notifications.addNotificationReceivedListener(notification => {
-      console.log('--- NOTIFICAÇÃO RECEBIDA (FOREGROUND) ---');
-      console.log('Título:', notification.request.content.title);
-    });
-
     return () => {
       subscription.remove();
-      foregroundSubscription.remove();
     };
   }, []);
 
@@ -113,6 +98,25 @@ function AppContent() {
       <Tab.Navigator
         screenOptions={({ route }) => ({
           tabBarIcon: ({ focused, color, size }) => {
+            if (route.name === 'Perfil' && authState.photoUrl) {
+              return (
+                <View style={{
+                  width: size,
+                  height: size,
+                  borderRadius: size / 2,
+                  borderWidth: focused ? 2 : 0,
+                  borderColor: color,
+                  overflow: 'hidden',
+                  backgroundColor: 'rgba(255,255,255,0.1)'
+                }}>
+                  <Image
+                    source={{ uri: authState.photoUrl }}
+                    style={{ width: '100%', height: '100%' }}
+                  />
+                </View>
+              );
+            }
+
             let iconName;
             switch (route.name) {
               case 'Home':
@@ -226,6 +230,7 @@ export default function App() {
           hasProfile: !!profile,
           userName: user.name || 'Usuário',
           userId: user.id,
+          photoUrl: user.photoUrl,
         });
       } else {
         setAuthState({
@@ -234,6 +239,7 @@ export default function App() {
           hasProfile: false,
           userName: '',
           userId: null,
+          photoUrl: null,
         });
       }
     });
