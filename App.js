@@ -8,7 +8,7 @@ import { BlurView } from 'expo-blur';
 import { View, ActivityIndicator } from 'react-native';
 import { lightImpact, mediumImpact } from './src/services/haptics';
 import * as Notifications from 'expo-notifications';
-import { configureNotifications, requestPermissions, handleNotificationAction, WATER_CATEGORY, listScheduledNotifications, testImmediateNotification, testSupplementNotification } from './src/services/notifications';
+import { configureNotifications, requestPermissions, handleNotificationAction, WATER_CATEGORY, listScheduledNotifications, testImmediateNotification, testSupplementNotification, testSupplementInterval } from './src/services/notifications';
 import { onAuthStateChange } from './src/services/authStorage';
 import { getProfile } from './src/services/storage';
 
@@ -69,6 +69,7 @@ function AppContent() {
       await listScheduledNotifications();
       // testImmediateNotification(); 
       // testSupplementNotification();
+      testSupplementInterval(); // NEW: Test with 60s interval
     };
 
     initNotifications();
@@ -94,8 +95,15 @@ function AppContent() {
       }
     });
 
+    // Listen for notification arrival in foreground
+    const foregroundSubscription = Notifications.addNotificationReceivedListener(notification => {
+      console.log('--- NOTIFICAÇÃO RECEBIDA (FOREGROUND) ---');
+      console.log('Título:', notification.request.content.title);
+    });
+
     return () => {
       subscription.remove();
+      foregroundSubscription.remove();
     };
   }, []);
 

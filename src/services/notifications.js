@@ -143,9 +143,9 @@ export const scheduleSupplementReminder = async (id, name, time) => {
     // Create trigger for daily at specific time
     // Android requires explicit 'daily' type or matching object structure, but avoiding 'calendar' type
     const trigger = {
+        type: Notifications.SchedulableTriggerInputTypes.DAILY,
         hour: hours,
         minute: minutes,
-        repeats: true,
     };
 
     try {
@@ -238,9 +238,9 @@ export const scheduleStreakReminder = async () => {
     await cancelStreakReminder();
 
     const trigger = {
+        type: Notifications.SchedulableTriggerInputTypes.DAILY,
         hour: 21, // 9 PM
         minute: 0,
-        repeats: true,
     };
 
     try {
@@ -279,7 +279,8 @@ export const listScheduledNotifications = async () => {
     console.log('--- NOTIFICAÇÕES AGENDADAS ---');
     console.log(`Total: ${scheduled.length}`);
     scheduled.forEach((n, i) => {
-        console.log(`[${i + 1}] ID: ${n.identifier} | Título: ${n.content.title} | Gatilho:`, JSON.stringify(n.trigger));
+        const type = n.trigger.type || (n.trigger.hour !== undefined ? 'calendar' : 'unknown');
+        console.log(`[${i + 1}] ID: ${n.identifier} | Título: ${n.content.title} | Gatilho (${type}):`, JSON.stringify(n.trigger));
     });
     console.log('------------------------------');
     return scheduled;
@@ -312,4 +313,36 @@ export const testSupplementNotification = async () => {
     console.log(`Agendando para: ${timeStr}`);
     
     return await scheduleSupplementReminder('debug-test', 'Teste de 1 Minuto', timeStr);
+};
+
+/**
+ * Debug: Test supplement notification via INTERVAL (60 seconds)
+ * This helps verify if the issue is strictly the DAILY calendar trigger.
+ */
+export const testSupplementInterval = async () => {
+    console.log('--- TESTE SUPLEMENTO (INTERVALO 60s) ---');
+    const trigger = {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: 60,
+        repeats: false,
+    };
+    
+    try {
+        const id = await Notifications.scheduleNotificationAsync({
+            content: {
+                title: `Teste Suplemento 💊`,
+                body: `Teste de 1 minuto via intervalo`,
+                categoryIdentifier: SUPPLEMENT_CATEGORY,
+                data: { type: 'supplement', supplementId: 'debug-interval' },
+                sound: false,
+                priority: Notifications.AndroidNotificationPriority.MAX,
+                vibrationPattern: [0, 250, 250, 250],
+            },
+            trigger,
+        });
+        console.log(`Teste agendado com sucesso! ID: ${id}`);
+        return id;
+    } catch (e) {
+        console.error('Falha no agendamento de teste:', e);
+    }
 };
