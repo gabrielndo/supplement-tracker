@@ -149,6 +149,7 @@ export const scheduleSupplementReminder = async (id, name, time) => {
     };
 
     try {
+        console.log(`Agendando suplemento: ${name} para as ${time} (H:${hours} M:${minutes})`);
         const notificationId = await Notifications.scheduleNotificationAsync({
             content: {
                 title: `Hora do Suplemento 💊`,
@@ -163,9 +164,10 @@ export const scheduleSupplementReminder = async (id, name, time) => {
             trigger,
         });
 
+        console.log(`Suplemento agendado com sucesso! ID da notificação: ${notificationId}`);
         return notificationId;
     } catch (error) {
-        console.warn('Error scheduling supplement reminder:', error);
+        console.error('ERRO ao agendar lembrete de suplemento:', error);
         return null;
     }
 };
@@ -277,7 +279,7 @@ export const listScheduledNotifications = async () => {
     console.log('--- NOTIFICAÇÕES AGENDADAS ---');
     console.log(`Total: ${scheduled.length}`);
     scheduled.forEach((n, i) => {
-        console.log(`[${i + 1}] ID: ${n.identifier} | Título: ${n.content.title} | Gatilho:`, n.trigger);
+        console.log(`[${i + 1}] ID: ${n.identifier} | Título: ${n.content.title} | Gatilho:`, JSON.stringify(n.trigger));
     });
     console.log('------------------------------');
     return scheduled;
@@ -293,4 +295,21 @@ export const testImmediateNotification = async () => {
         "Esta é uma notificação de teste para verificar se o sistema está funcionando.",
         5
     );
+};
+
+/**
+ * Debug: Test supplement notification in 60 seconds
+ */
+export const testSupplementNotification = async () => {
+    const now = new Date();
+    const testDate = new Date(now.getTime() + 65 * 1000); // 65 seconds
+    const h = testDate.getHours();
+    const m = testDate.getMinutes();
+    const timeStr = `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}`;
+    
+    console.log(`--- TESTE SUPLEMENTO ---`);
+    console.log(`Hora atual: ${now.toLocaleTimeString()}`);
+    console.log(`Agendando para: ${timeStr}`);
+    
+    return await scheduleSupplementReminder('debug-test', 'Teste de 1 Minuto', timeStr);
 };

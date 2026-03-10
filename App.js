@@ -8,7 +8,7 @@ import { BlurView } from 'expo-blur';
 import { View, ActivityIndicator } from 'react-native';
 import { lightImpact } from './src/services/haptics';
 import * as Notifications from 'expo-notifications';
-import { configureNotifications, requestPermissions, handleNotificationAction, WATER_CATEGORY, listScheduledNotifications, testImmediateNotification } from './src/services/notifications';
+import { configureNotifications, requestPermissions, handleNotificationAction, WATER_CATEGORY, listScheduledNotifications, testImmediateNotification, testSupplementNotification } from './src/services/notifications';
 import { onAuthStateChange } from './src/services/authStorage';
 import { getProfile } from './src/services/storage';
 
@@ -67,13 +67,15 @@ function AppContent() {
       await configureNotifications();
       await requestPermissions();
       await listScheduledNotifications();
-      // testImmediateNotification(); // Uncomment to test on launch
+      // testImmediateNotification(); 
+      // testSupplementNotification();
     };
 
     initNotifications();
 
     // Listen for user interaction with notifications
     const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log('--- INTERAÇÃO COM NOTIFICAÇÃO ---');
       const { actionIdentifier, notification } = response;
       const data = notification.request.content.data;
       const category = notification.request.content.categoryIdentifier;
