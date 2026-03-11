@@ -89,11 +89,11 @@ export default function WelcomeScreen({ onComplete }) {
                 successFeedback();
                 onComplete();
             } else {
-                Alert.alert('Erro ao entrar', `${result.error}\n\nCódigo: ${result.code || 'sem código'}`);
+                Alert.alert('Erro ao entrar', result.error);
             }
         } catch (err) {
             setLoading(false);
-            Alert.alert('ERRO FATAL Login', `${err.message}\n\n${err.code || ''}`);
+            Alert.alert('Erro inesperado', 'Ocorreu um problema ao tentar entrar. Verifique sua conexão e tente novamente.');
         }
     };
 
@@ -124,11 +124,22 @@ export default function WelcomeScreen({ onComplete }) {
                 successFeedback();
                 onComplete();
             } else {
-                Alert.alert('Erro ao criar conta', `${result.error}\n\nCódigo: ${result.code || 'sem código'}`);
+                if (result.code === 'auth/email-already-in-use') {
+                    Alert.alert(
+                        'E-mail já cadastrado',
+                        result.error,
+                        [
+                            { text: 'Cancelar', style: 'cancel' },
+                            { text: 'Ir para Login', onPress: () => resetForm('login') }
+                        ]
+                    );
+                } else {
+                    Alert.alert('Erro ao criar conta', result.error);
+                }
             }
         } catch (err) {
             setLoading(false);
-            Alert.alert('ERRO FATAL Signup', `${err.message}\n\n${err.code || ''}`);
+            Alert.alert('Erro inesperado', 'Ocorreu um problema ao criar sua conta. Verifique sua conexão e tente novamente.');
         }
     };
 
@@ -180,7 +191,7 @@ export default function WelcomeScreen({ onComplete }) {
         } catch (error) {
             console.error('Google Sign-In Error:', error);
             if (error.code !== 12501 && error.code !== 'SIGN_IN_CANCELLED') {
-                Alert.alert('Erro Google', `Code: ${error.code}\nMsg: ${error.message}`);
+                Alert.alert('Erro no Google', 'Não foi possível completar o login com o Google no momento.');
             }
         } finally {
             setLoading(false);

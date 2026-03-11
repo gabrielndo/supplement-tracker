@@ -77,8 +77,8 @@ export const registerWithEmail = async (name, email, password) => {
         };
     } catch (error) {
         let message = 'Erro ao criar conta. Tente novamente.';
-        if (error.code === 'auth/email-already-in-use') message = 'Este e-mail já está cadastrado.';
-        if (error.code === 'auth/invalid-email') message = 'E-mail inválido.';
+        if (error.code === 'auth/email-already-in-use') message = 'Este e-mail já está cadastrado. Você pode recuperar sua senha na tela de login.';
+        if (error.code === 'auth/invalid-email') message = 'O e-mail digitado parece inválido.';
         if (error.code === 'auth/weak-password') message = 'Senha muito fraca. Use pelo menos 6 caracteres.';
         return { success: false, error: message, code: error.code };
     }
