@@ -6,7 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { View, ActivityIndicator, Image } from 'react-native';
-import { lightImpact, mediumImpact } from './src/services/haptics';
+import { lightImpact, mediumImpact, heavyImpact } from './src/services/haptics';
 import * as Notifications from 'expo-notifications';
 import { configureNotifications, requestPermissions, handleNotificationAction, WATER_CATEGORY } from './src/services/notifications';
 import { onAuthStateChange } from './src/services/authStorage';
@@ -188,7 +188,7 @@ function AppContent({ authState }) {
         })}
         listeners={({ navigation }) => ({
           tabPress: () => {
-            mediumImpact();
+            heavyImpact();
           },
         })}
       >

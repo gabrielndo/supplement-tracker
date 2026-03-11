@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import { Platform, Vibration } from 'react-native';
 import * as Haptics from 'expo-haptics';
 
 /**
@@ -33,6 +33,8 @@ export const mediumImpact = () => {
 export const heavyImpact = () => {
     if (isHapticsAvailable) {
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
+        // Haptic Booster: Native vibration for stronger physical response
+        Vibration.vibrate(60);
     }
 };
 
