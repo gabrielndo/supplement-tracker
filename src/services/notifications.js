@@ -1,7 +1,7 @@
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 import { colors } from '../styles/theme';
-import { addWaterEntry, logConsumption, getSupplements } from './storage';
+import { addWaterEntry, logConsumption, getSupplements, getConsumptionLog } from './storage';
 
 export const WATER_CATEGORY = 'WATER_REMINDER';
 export const SUPPLEMENT_CATEGORY = 'SUPPLEMENT_REMINDER';
@@ -14,11 +14,33 @@ export const SUPPLEMENT_ACTION_TAKE = 'ACTION_TAKE_SUPPLEMENT';
  */
 export const configureNotifications = async () => {
     Notifications.setNotificationHandler({
-        handleNotification: async () => ({
-            shouldShowAlert: true,
-            shouldPlaySound: false,
-            shouldSetBadge: true,
-        }),
+        handleNotification: async (notification) => {
+            const data = notification.request.content.data;
+
+            // If it's a supplement notification, check if already taken today
+            if (data?.type === 'supplement' && data?.supplementId) {
+                try {
+                    const today = new Date().toISOString().split('T')[0];
+                    const log = await getConsumptionLog(today);
+                    if (log.includes(data.supplementId)) {
+                        // Already taken today — silence the notification
+                        return {
+                            shouldShowAlert: false,
+                            shouldPlaySound: false,
+                            shouldSetBadge: false,
+                        };
+                    }
+                } catch (e) {
+                    // On error, show the notification anyway
+                }
+            }
+
+            return {
+                shouldShowAlert: true,
+                shouldPlaySound: false,
+                shouldSetBadge: true,
+            };
+        },
     });
 
     if (Platform.OS === 'android') {
