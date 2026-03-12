@@ -15,6 +15,7 @@ import { colors, spacing, borderRadius, typography } from '../styles/theme';
 import { getWaterHistory, getProfile } from '../services/storage';
 import { calculateWaterGoal } from '../services/aiSuggestions';
 import { lightImpact } from '../services/haptics';
+import { getLocalDateStr } from '../utils/dateHelper';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -198,7 +199,7 @@ export default function WaterHistoryScreen({ navigation }) {
                             {history.map((day, index) => {
                                 const heightPercent = Math.min((day.amount / maxAmount) * 100, 100);
                                 const isOnGoal = day.amount >= goal;
-                                const isToday = day.date === new Date().toISOString().split('T')[0];
+                                const isToday = day.date === getLocalDateStr();
 
                                 return (
                                     <View key={day.date} style={styles.barWrapper}>

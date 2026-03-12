@@ -2,6 +2,7 @@ import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 import { colors } from '../styles/theme';
 import { addWaterEntry, logConsumption, getSupplements, getConsumptionLog } from './storage';
+import { getLocalDateStr } from '../utils/dateHelper';
 
 export const WATER_CATEGORY = 'WATER_REMINDER';
 export const SUPPLEMENT_CATEGORY = 'SUPPLEMENT_REMINDER';
@@ -20,7 +21,7 @@ export const configureNotifications = async () => {
             // If it's a supplement notification, check if already taken today
             if (data?.type === 'supplement' && data?.supplementId) {
                 try {
-                    const today = new Date().toISOString().split('T')[0];
+                    const today = getLocalDateStr();
                     const log = await getConsumptionLog(today);
                     if (log.includes(data.supplementId)) {
                         // Already taken today — silence the notification
@@ -211,7 +212,7 @@ export const cancelSupplementReminder = async (supplementId) => {
 export const handleNotificationAction = async (response) => {
     const actionId = response.actionIdentifier;
     const data = response.notification.request.content.data;
-    const today = new Date().toISOString().split('T')[0];
+    const today = getLocalDateStr();
 
     if (actionId === WATER_ACTION_DRINK) {
         await addWaterEntry(today, 200); // Add 200ml default

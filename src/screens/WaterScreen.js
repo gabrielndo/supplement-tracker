@@ -27,6 +27,7 @@ import HourlyWaterChart from '../components/HourlyWaterChart';
 import CelebrationAnimation from '../components/CelebrationAnimation';
 import { checkAndNotify } from '../utils/achievements';
 import { scheduleWaterReminder, cancelWaterReminders } from '../services/notifications';
+import { getLocalDateStr } from '../utils/dateHelper';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -364,7 +365,7 @@ export default function WaterScreen({ navigation }) {
     const [showCelebration, setShowCelebration] = useState(false);
     const [celebrationShownToday, setCelebrationShownToday] = useState(false);
 
-    const today = new Date().toISOString().split('T')[0];
+    const today = getLocalDateStr();
 
     useFocusEffect(
         useCallback(() => {

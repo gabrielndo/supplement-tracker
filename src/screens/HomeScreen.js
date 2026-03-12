@@ -27,6 +27,7 @@ import { calculateWaterGoal } from '../services/aiSuggestions';
 import { successFeedback, mediumImpact, lightImpact, errorFeedback } from '../services/haptics';
 import { checkAndNotify } from '../utils/achievements';
 import { scheduleStreakReminder } from '../services/notifications';
+import { getLocalDateStr } from '../utils/dateHelper';
 
 // Animated Glass Card Component
 const GlassCard = ({ children, style, onPress, variant = 'default', disabled = false }) => {
@@ -128,7 +129,7 @@ export default function HomeScreen({ navigation }) {
     const [confirmRemoveVisible, setConfirmRemoveVisible] = useState(false);
     const [supplementToRemove, setSupplementToRemove] = useState(null);
 
-    const getTodayStr = () => new Date().toISOString().split('T')[0];
+    const getTodayStr = () => getLocalDateStr();
     const [today, setToday] = useState(getTodayStr());
 
     const loadData = async (targetDate = getTodayStr()) => {

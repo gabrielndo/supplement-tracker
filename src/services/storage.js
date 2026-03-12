@@ -12,6 +12,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { doc, getDoc, setDoc, getDocs, collection } from 'firebase/firestore';
 import { db, auth } from './firebase';
+import { getLocalDateStr } from '../utils/dateHelper';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -239,7 +240,7 @@ export const getWaterHistory = async (days = 7) => {
         const dates = Array.from({ length: days }, (_, i) => {
             const date = new Date();
             date.setDate(date.getDate() - i);
-            return date.toISOString().split('T')[0];
+            return getLocalDateStr(date);
         });
 
         // Find which dates are missing in local cache
@@ -395,7 +396,7 @@ export const getStreak = async () => {
         for (let i = 0; i < 30; i++) {
             const date = new Date(today);
             date.setDate(date.getDate() - i);
-            const dateStr = date.toISOString().split('T')[0];
+            const dateStr = getLocalDateStr(date);
             const dateTimestamp = date.getTime();
 
             const supplementsOnDate = supplements.filter(s => {
@@ -434,7 +435,7 @@ export const getConsumptionHistory = async (days = 7) => {
         for (let i = 0; i < days; i++) {
             const date = new Date();
             date.setDate(date.getDate() - i);
-            const dateStr = date.toISOString().split('T')[0];
+            const dateStr = getLocalDateStr(date);
             const dailyLog = logs[dateStr] || [];
             history.unshift({
                 date: dateStr,
@@ -457,7 +458,7 @@ export const hasShownCelebrationToday = async () => {
         const data = await AsyncStorage.getItem(KEYS.WATER_CELEBRATION);
         if (!data) return false;
         const { date } = JSON.parse(data);
-        return date === new Date().toISOString().split('T')[0];
+        return date === getLocalDateStr();
     } catch (error) {
         return false;
     }
@@ -466,7 +467,7 @@ export const hasShownCelebrationToday = async () => {
 export const markCelebrationShown = async () => {
     try {
         await AsyncStorage.setItem(KEYS.WATER_CELEBRATION, JSON.stringify({
-            date: new Date().toISOString().split('T')[0],
+            date: getLocalDateStr(),
         }));
         return true;
     } catch (error) {
