@@ -463,22 +463,32 @@ export default function WaterScreen({ navigation }) {
 
     const handleAddWater = async (amount) => {
         successFeedback();
-        const updated = await addWaterEntry(today, amount);
-        if (updated) {
-            setTodayData(updated);
-            setHistory(await getWaterHistory(7));
 
-            // Check if goal just reached and celebration not shown yet
-            const newPercentage = Math.round((updated.amount / goal) * 100);
-            if (newPercentage >= 100 && !celebrationShownToday) {
-                setShowCelebration(true);
-                setCelebrationShownToday(true);
-                await markCelebrationShown();
+        // Optimistic UI: update screen instantly
+        setTodayData(prev => ({
+            amount: (prev.amount || 0) + amount,
+            entries: [...(prev.entries || []), { amount, time: new Date().toISOString() }],
+        }));
+
+        // Persist in background (AsyncStorage + Firestore)
+        addWaterEntry(today, amount).then(updated => {
+            if (updated) {
+                // Sync precise value from storage
+                setTodayData(updated);
+
+                // Check if goal just reached
+                const newPercentage = Math.round((updated.amount / goal) * 100);
+                if (newPercentage >= 100 && !celebrationShownToday) {
+                    setShowCelebration(true);
+                    setCelebrationShownToday(true);
+                    markCelebrationShown();
+                }
+
+                // Refresh history and achievements in background
+                getWaterHistory(7).then(setHistory);
+                checkAndNotify(goal).catch(() => {});
             }
-
-            // Check for achievements
-            await checkAndNotify(goal);
-        }
+        });
     };
 
     const confirmRemoveEntry = async () => {
