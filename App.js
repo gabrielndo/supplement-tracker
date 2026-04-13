@@ -223,16 +223,20 @@ export default function App() {
 
   useEffect(() => {
     // Firebase auth state listener - auto-updates on login/logout
-    const unsubscribe = onAuthStateChange(async (user) => {
+    const unsubscribe = onAuthStateChange((user) => {
       if (user) {
-        const profile = await getProfile(user.id);
+        // Show the app immediately as soon as Firebase confirms auth.
+        // Then check for profile in the background without blocking render.
         setAuthState({
           loading: false,
           isAuth: true,
-          hasProfile: !!profile,
+          hasProfile: false, // assume no profile initially; will update below
           userName: user.name || 'Usuário',
           userId: user.id,
           photoUrl: user.photoUrl,
+        });
+        getProfile(user.id).then(profile => {
+          setAuthState(prev => ({ ...prev, hasProfile: !!profile }));
         });
       } else {
         setAuthState({
