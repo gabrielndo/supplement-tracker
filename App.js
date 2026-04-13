@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { View, ActivityIndicator, Image } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { lightImpact, mediumImpact, heavyImpact } from './src/services/haptics';
 import * as Notifications from 'expo-notifications';
 import { configureNotifications, requestPermissions, handleNotificationAction, WATER_CATEGORY } from './src/services/notifications';
@@ -60,6 +61,7 @@ function ProfileStackNavigator() {
 
 // Main App Component wrapper for navigation refs
 function AppContent({ authState }) {
+  const insets = useSafeAreaInsets();
   const navigation = useNavigation();
 
   useEffect(() => {
@@ -162,7 +164,7 @@ function AppContent({ authState }) {
           ),
           tabBarStyle: {
             position: 'absolute',
-            bottom: 15,
+            bottom: Math.max(insets.bottom, 10) + 5,
             left: 15,
             right: 15,
             elevation: 10,
