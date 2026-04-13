@@ -2,7 +2,7 @@
   "expo": {
     "name": "MeusSuple - Rastreador e Lembrete",
     "slug": "supplement-tracker",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "scheme": "com.supplementtracker.app",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
