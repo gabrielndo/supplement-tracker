@@ -1,5 +1,5 @@
 import * as Notifications from 'expo-notifications';
-import { Platform } from 'react-native';
+import { Platform, Alert, Linking } from 'react-native';
 import { colors } from '../styles/theme';
 import { addWaterEntry, logConsumption, getSupplements, getConsumptionLog } from './storage';
 import { getLocalDateStr } from '../utils/dateHelper';
@@ -79,12 +79,33 @@ export const configureNotifications = async () => {
  */
 export const requestPermissions = async () => {
     try {
-        const { status: existingStatus } = await Notifications.getPermissionsAsync();
+        const { status: existingStatus, canAskAgain } = await Notifications.getPermissionsAsync();
         let finalStatus = existingStatus;
 
         if (existingStatus !== 'granted') {
-            const { status } = await Notifications.requestPermissionsAsync();
-            finalStatus = status;
+            if (canAskAgain) {
+                // Return a promise that resolves when the user dismisses the alert
+                await new Promise(resolve => {
+                    Alert.alert(
+                        'Notificações Importantes 🔔',
+                        'Para te lembrar de beber água e tomar seus suplementos na hora exata, precisamos que ative as notificações.\n\nElas são o coração do app!',
+                        [{ text: 'Entendi', onPress: resolve }]
+                    );
+                });
+
+                const { status } = await Notifications.requestPermissionsAsync();
+                finalStatus = status;
+            } else {
+                // The user has permanently denied permissions (or it's restricted)
+                Alert.alert(
+                    'Notificações Desativadas',
+                    'O app precisa enviar lembretes para funcionar corretamente. Por favor, abra as configurações do seu celular e ative as notificações para o MeusSuple.',
+                    [
+                        { text: 'Agora Não', style: 'cancel' },
+                        { text: 'Abrir Configurações', onPress: () => Linking.openSettings() }
+                    ]
+                );
+            }
         }
 
         return finalStatus === 'granted';
