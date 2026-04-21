@@ -67,7 +67,6 @@ function AppContent({ authState }) {
   useEffect(() => {
     const initNotifications = async () => {
       await configureNotifications();
-      await requestPermissions();
     };
 
     initNotifications();
@@ -216,7 +215,6 @@ export default function App() {
   useEffect(() => {
     const initNotifications = async () => {
       await configureNotifications();
-      await requestPermissions();
     };
     initNotifications();
   }, []);

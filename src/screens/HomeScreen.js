@@ -26,7 +26,7 @@ import {
 import { calculateWaterGoal } from '../services/aiSuggestions';
 import { successFeedback, mediumImpact, lightImpact, errorFeedback } from '../services/haptics';
 import { checkAndNotify } from '../utils/achievements';
-import { scheduleStreakReminder } from '../services/notifications';
+import { scheduleStreakReminder, requestPermissions } from '../services/notifications';
 import { getLocalDateStr } from '../utils/dateHelper';
 
 // Animated Glass Card Component
@@ -152,6 +152,11 @@ export default function HomeScreen({ navigation }) {
 
         await Promise.all([p1, p2, p3, p4, p5]);
     };
+
+    // Solicitar permissões ao abrir a Home caso não tenha
+    useEffect(() => {
+        requestPermissions();
+    }, []);
 
     // AppState & Midnight Listener for Reset
     useEffect(() => {

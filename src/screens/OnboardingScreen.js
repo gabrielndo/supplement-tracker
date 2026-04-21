@@ -15,6 +15,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, typography } from '../styles/theme';
 import { saveProfile } from '../services/storage';
 import { selectionFeedback, successFeedback, lightImpact } from '../services/haptics';
+import { requestPermissions } from '../services/notifications';
 
 const GENDERS = [
     { id: 'male', label: 'Masculino', symbol: '♂' },
@@ -193,6 +194,8 @@ export default function OnboardingScreen({ userName, onComplete }) {
 
         if (success) {
             successFeedback();
+            // Demanda a permissão de notificação no final do onboarding (momento com mais contexto)
+            await requestPermissions();
             onComplete();
         } else {
             Alert.alert('Erro', 'Não foi possível salvar o perfil');
