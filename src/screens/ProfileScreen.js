@@ -12,7 +12,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { colors, spacing, borderRadius, typography } from '../styles/theme';
 import { getProfile, saveProfile } from '../services/storage';
-import { getAuthUser, logout } from '../services/authStorage';
+import { getAuthUser, logout, deleteAccount } from '../services/authStorage';
 import { lightImpact, successFeedback, selectionFeedback } from '../services/haptics';
 
 const GENDERS = [
@@ -169,6 +169,45 @@ export default function ProfileScreen() {
                         setTimeout(() => {
                             throw new Error('User logged out - reload app');
                         }, 100);
+                    },
+                },
+            ]
+        );
+    };
+
+    const handleDeleteAccount = () => {
+        Alert.alert(
+            'Excluir Conta',
+            'ATENÇÃO: Esta ação é irreversível. Todos os seus dados, histórico e perfil serão excluídos permanentemente. Deseja continuar?',
+            [
+                {
+                    text: 'Cancelar',
+                    style: 'cancel',
+                    onPress: () => lightImpact(),
+                },
+                {
+                    text: 'Excluir Minha Conta',
+                    style: 'destructive',
+                    onPress: async () => {
+                        const result = await deleteAccount();
+                        if (result.success) {
+                            successFeedback();
+                            Alert.alert('Conta excluída', 'Sua conta e dados foram apagados com sucesso.');
+                            setTimeout(() => {
+                                throw new Error('Account deleted - reload app');
+                            }, 100);
+                        } else if (result.requiresRecentLogin) {
+                            Alert.alert(
+                                'Segurança',
+                                'Para excluir sua conta, você precisa ter feito login recentemente. Faremos o logout agora. Por favor, entre novamente e tente excluir a conta.',
+                                [{ text: 'OK', onPress: async () => {
+                                    await logout();
+                                    setTimeout(() => { throw new Error('User logged out - reload app'); }, 100);
+                                } }]
+                            );
+                        } else {
+                            Alert.alert('Erro', result.error || 'Não foi possível excluir a conta.');
+                        }
                     },
                 },
             ]
@@ -451,6 +490,16 @@ export default function ProfileScreen() {
                             style={StyleSheet.absoluteFill}
                         />
                         <Text style={styles.logoutButtonText}>Sair da Conta 🚪</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity
+                        style={[styles.logoutButton, { marginTop: 12, borderColor: 'rgba(239, 68, 68, 0.5)' }]}
+                        onPress={() => {
+                            lightImpact();
+                            handleDeleteAccount();
+                        }}
+                    >
+                        <Text style={[styles.logoutButtonText, { color: '#ef4444' }]}>Excluir Minha Conta 🗑️</Text>
                     </TouchableOpacity>
                 </View>
             )}

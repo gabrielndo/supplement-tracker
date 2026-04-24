@@ -5,6 +5,7 @@ import {
     updateProfile,
     onAuthStateChanged,
     sendPasswordResetEmail,
+    deleteUser,
 } from 'firebase/auth';
 import { auth } from './firebase';
 
@@ -134,3 +135,20 @@ export const isAuthenticated = () => {
 // Legacy compatibility - kept for any code still using these
 export const saveAuthUser = async () => true;
 export const updateAuthUser = async () => true;
+
+/**
+ * Excluir conta
+ */
+export const deleteAccount = async () => {
+    try {
+        const user = auth.currentUser;
+        if (!user) return { success: false, error: 'Usuário não encontrado.' };
+        await deleteUser(user);
+        return { success: true };
+    } catch (error) {
+        if (error.code === 'auth/requires-recent-login') {
+            return { success: false, requiresRecentLogin: true };
+        }
+        return { success: false, error: error.message };
+    }
+};

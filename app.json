@@ -2,7 +2,7 @@
   "expo": {
     "name": "MeusSuple - Rastreador e Lembrete",
     "slug": "supplement-tracker",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "scheme": "com.supplementtracker.app",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -19,7 +19,7 @@
       "buildNumber": "1"
     },
     "android": {
-      "versionCode": 3,
+      "versionCode": 4,
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#0f172a"
