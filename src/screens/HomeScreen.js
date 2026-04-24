@@ -155,7 +155,10 @@ export default function HomeScreen({ navigation }) {
 
     // Solicitar permissões ao abrir a Home caso não tenha
     useEffect(() => {
-        requestPermissions();
+        const timer = setTimeout(() => {
+            requestPermissions();
+        }, 1500);
+        return () => clearTimeout(timer);
     }, []);
 
     // AppState & Midnight Listener for Reset

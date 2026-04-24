@@ -6,7 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { View, ActivityIndicator, Image } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaProvider, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { lightImpact, mediumImpact, heavyImpact } from './src/services/haptics';
 import * as Notifications from 'expo-notifications';
 import { configureNotifications, requestPermissions, handleNotificationAction, WATER_CATEGORY } from './src/services/notifications';
@@ -261,28 +261,21 @@ export default function App() {
     }));
   };
 
-  if (authState.loading) {
-    return (
-      <View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color={colors.primary} />
-      </View>
-    );
-  }
-
-  // Not authenticated -> Show Welcome/Login screen
-  if (!authState.isAuth) {
-    return <WelcomeScreen onComplete={handleWelcomeComplete} />;
-  }
-
-  // Authenticated but no profile -> Show Onboarding
-  if (!authState.hasProfile) {
-    return <OnboardingScreen userName={authState.userName} onComplete={handleOnboardingComplete} />;
-  }
-
-  // Authenticated and has profile -> Show main app
   return (
-    <NavigationContainer>
-      <AppContent authState={authState} />
-    </NavigationContainer>
+    <SafeAreaProvider>
+      {authState.loading ? (
+        <View style={{ flex: 1, backgroundColor: colors.background, justifyContent: 'center', alignItems: 'center' }}>
+          <ActivityIndicator size="large" color={colors.primary} />
+        </View>
+      ) : !authState.isAuth ? (
+        <WelcomeScreen onComplete={handleWelcomeComplete} />
+      ) : !authState.hasProfile ? (
+        <OnboardingScreen userName={authState.userName} onComplete={handleOnboardingComplete} />
+      ) : (
+        <NavigationContainer>
+          <AppContent authState={authState} />
+        </NavigationContainer>
+      )}
+    </SafeAreaProvider>
   );
 }

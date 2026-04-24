@@ -243,7 +243,6 @@ export default function OnboardingScreen({ userName, onComplete }) {
                                             gender === g.id && styles.genderButtonActive,
                                         ]}
                                         onPress={() => {
-                                            selectionFeedback();
                                             setGender(g.id);
                                         }}
                                     >
@@ -281,7 +280,7 @@ export default function OnboardingScreen({ userName, onComplete }) {
                                     placeholderTextColor={colors.textMuted}
                                     keyboardType="numeric"
                                     maxLength={10}
-                                    onFocus={() => lightImpact()}
+                                    maxLength={10}
                                 />
                                 {errors.birthDate && (
                                     <Text style={styles.errorText}>⚠️ {errors.birthDate}</Text>
@@ -296,7 +295,6 @@ export default function OnboardingScreen({ userName, onComplete }) {
                             <TouchableOpacity
                                 style={styles.nextButton}
                                 onPress={() => {
-                                    lightImpact();
                                     handleNext();
                                 }}
                             >
@@ -367,7 +365,6 @@ export default function OnboardingScreen({ userName, onComplete }) {
                                             goal === g.id && styles.goalButtonActive,
                                         ]}
                                         onPress={() => {
-                                            selectionFeedback();
                                             setGoal(g.id);
                                         }}
                                     >
@@ -392,7 +389,6 @@ export default function OnboardingScreen({ userName, onComplete }) {
                                 <TouchableOpacity
                                     style={styles.backButton}
                                     onPress={() => {
-                                        lightImpact();
                                         handleBack();
                                     }}
                                 >
@@ -405,7 +401,6 @@ export default function OnboardingScreen({ userName, onComplete }) {
                                 <TouchableOpacity
                                     style={styles.completeButton}
                                     onPress={() => {
-                                        lightImpact();
                                         handleComplete();
                                     }}
                                 >
